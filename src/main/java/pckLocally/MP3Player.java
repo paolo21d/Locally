@@ -9,13 +9,17 @@ import javafx.util.Duration;
 import java.io.File;
 
 public class MP3Player {
-    private String path="C:\\Users\\paolo\\Desktop\\Java Start\\MP3 V2\\src\\sample\\TS22.mp3";
+    private String path;
     Duration duration=null;
     private Media media;
     private MediaPlayer mediaPlayer;
     private MediaView mediaView;
     private boolean played=false;
     private boolean paused=false;
+
+    public MP3Player() {
+        path = "C:\\Users\\paolo\\Desktop\\Java Start\\MP3 V2\\src\\sample\\TS22.mp3";
+    }
 
     void play(){
         if(path==null) {
