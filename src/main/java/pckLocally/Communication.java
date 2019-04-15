@@ -2,10 +2,12 @@ package pckLocally;
 
 import java.io.*;
 import java.net.*;
+import java.util.Random;
 
 public class Communication extends Thread{
     private int communicationPort = 10000;
     private MP3Player player;
+    private int pin;
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -15,8 +17,12 @@ public class Communication extends Thread{
     private String message;
     Communication(MP3Player p){
         player = p;
+        Random generator = new Random();
+        pin = generator.nextInt(1000)+8999;
     }
-
+    int getPin(){
+        return  pin;
+    }
     public void run() {
         System.out.println("Thread start");
         DatagramSocket udpSocket = null;
