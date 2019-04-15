@@ -18,7 +18,7 @@ public class MP3Player {
     private boolean paused=false;
 
     public MP3Player() {
-        path = "C:\\Users\\paolo\\Desktop\\Java Start\\MP3 V2\\src\\sample\\TS22.mp3";
+        path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS422.mp3";
     }
 
     void play(){

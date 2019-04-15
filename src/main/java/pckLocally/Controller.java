@@ -2,16 +2,13 @@ package pckLocally;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-
-import java.net.URL;
-import java.util.ResourceBundle;
 
 public class Controller {
     private  MP3Player player= new MP3Player();
     Communication communication = new Communication(player);
     boolean connection=false;
+
 
     @FXML
     private Button playButton;
@@ -30,11 +27,11 @@ public class Controller {
     @FXML
     private Button connectButton;
     @FXML
-    private TableView<?> TablePlaylist;
+    private TableView<Song> TablePlaylist;
     @FXML
-    private TableColumn<?, ?> SongColumn;
+    private TableColumn<Song, String> SongColumn;
     @FXML
-    private TableColumn<?, ?> TimeColumn;
+    private TableColumn<Song, String> TimeColumn;
 
 
     @FXML
@@ -65,9 +62,21 @@ public class Controller {
 
     @FXML
     void playButtonClick(ActionEvent event) {
-        player.play();
-        labelSongDescription.setText(player.getPath());
+        labelSongDescription.setText("Opening...");
+        try{
+            player.play();
+        }catch(Exception e){
+            labelSongDescription.setText("File Open Error. Choose right path to file...");
+            return;
+        }
+        String [] fullPath = player.getPath().split("/");
+        String title = fullPath[fullPath.length-1];
+        labelSongDescription.setText(title);
         pauseButton.setText("Pause");
+
+        ///fill table
+        Song song = new Song(title,"-");
+        //TablePlaylist.getItems().add(song);
     }
 
     @FXML
