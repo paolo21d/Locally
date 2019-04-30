@@ -12,7 +12,10 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/layoutMain.fxml"));
         primaryStage.setTitle("Locally");
-        primaryStage.setScene(new Scene(root, 600, 350));
+        Scene scene = new Scene(root, 600, 350);
+        scene.getStylesheets().add(getClass().getResource("/styleMain.css").toExternalForm());
+
+        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
     }

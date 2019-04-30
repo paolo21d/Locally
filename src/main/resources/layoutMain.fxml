@@ -14,7 +14,8 @@
 
 <VBox maxHeight="350.0" maxWidth="600.0" minHeight="350.0" minWidth="600.0" prefHeight="350.0" prefWidth="600.0"
       xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="pckLocally.Controller">
+      fx:controller="pckLocally.Controller"
+      styleClass="mainPane">
 
 
     <children>
@@ -39,7 +40,7 @@
         </MenuBar>
         <SplitPane dividerPositions="0.55" maxHeight="325.0" maxWidth="600.0" minHeight="325.0" minWidth="600.0" prefHeight="325.0" prefWidth="600.0">
             <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="309.0">
+                <AnchorPane fx:id="controlPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="309.0">
                     <children>
                         <Button fx:id="playButton" layoutX="23.0" layoutY="42.0" mnemonicParsing="false" onAction="#playButtonClick" prefHeight="65.0" prefWidth="73.0" text="PLAY" />
                         <Button fx:id="pauseButton" layoutX="127.0" layoutY="42.0" mnemonicParsing="false" onAction="#pauseButtonClick" prefHeight="65.0" prefWidth="73.0" text="PAUSE" />

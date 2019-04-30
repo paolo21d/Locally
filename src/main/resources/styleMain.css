@@ -1,0 +1,13 @@
+.root {
+    -fx-text-fill: #ffffff;
+    -fx-font-family: sans-serif;
+    -fx-background-color: #494949;
+}
+.mainPane{
+    -fx-text-fill: #ffffff;
+    -fx-font-family: sans-serif;
+    -fx-background-color: #494949;
+}
+#controlPane {
+    -fx-background-color: #494949;
+}

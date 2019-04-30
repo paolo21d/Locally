@@ -1,10 +1,17 @@
 package pckLocally;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 
-public class Controller {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class Controller implements Initializable {
     private  MP3Player player= new MP3Player();
     Communication communication = new Communication(player);
     boolean connection=false;
@@ -26,6 +33,7 @@ public class Controller {
     private Label labelSongDescription;
     @FXML
     private Button connectButton;
+
     @FXML
     private TableView<Song> TablePlaylist;
     @FXML
@@ -84,4 +92,15 @@ public class Controller {
         player.reload();
         pauseButton.setText("Pause");
     }
+
+    public void initialize(URL location, ResourceBundle resources) {
+        SongColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongName"));
+        TimeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongTime"));
+
+        TablePlaylist.setItems(observableList);
+    }
+    ObservableList<Song> observableList = FXCollections.observableArrayList(
+      new Song("Nazwa", "czas"),
+      new Song("Nazwa2", "czas2")
+    );
 }
