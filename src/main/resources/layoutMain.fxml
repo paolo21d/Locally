@@ -12,10 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="350.0" maxWidth="600.0" minHeight="350.0" minWidth="600.0" prefHeight="350.0" prefWidth="600.0"
-      xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="pckLocally.Controller"
-      styleClass="mainPane">
+<VBox maxHeight="350.0" maxWidth="600.0" minHeight="350.0" minWidth="600.0" prefHeight="350.0" prefWidth="600.0" styleClass="mainPane" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pckLocally.Controller">
 
 
     <children>
@@ -42,17 +39,19 @@
             <items>
                 <AnchorPane fx:id="controlPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="309.0">
                     <children>
-                        <Button fx:id="playButton" layoutX="23.0" layoutY="42.0" mnemonicParsing="false" onAction="#playButtonClick" prefHeight="65.0" prefWidth="73.0" text="PLAY" />
-                        <Button fx:id="pauseButton" layoutX="127.0" layoutY="42.0" mnemonicParsing="false" onAction="#pauseButtonClick" prefHeight="65.0" prefWidth="73.0" text="PAUSE" />
-                        <Button fx:id="reloadButton" layoutX="231.0" layoutY="42.0" mnemonicParsing="false" onAction="#reloadButtonClick" prefHeight="65.0" prefWidth="73.0" text="RELOAD" />
-                        <Button fx:id="chooseFileButton" layoutX="22.0" layoutY="266.0" mnemonicParsing="false" onAction="#chooseFileButtonClick" prefHeight="43.0" prefWidth="100.0" text="Choose File" />
-                        <Button fx:id="choosePlaylistButton" layoutX="131.0" layoutY="266.0" mnemonicParsing="false" onAction="#choosePlaylistButtonClick" prefHeight="43.0" prefWidth="100.0" text="Choose playlist" />
+                        <Button fx:id="prevButton" layoutX="23.0" layoutY="42.0" mnemonicParsing="false" onAction="#prevButtonClick" prefHeight="25.0" prefWidth="70.0" text="Prev" styleClass="controlButton"/>
+                        <Button fx:id="playPauseButton" layoutX="128.0" layoutY="42.0" mnemonicParsing="false" onAction="#playPauseButtonClick" prefHeight="66.0" prefWidth="70.0" text="PLAY"/>
+                        <Button fx:id="nextButton" layoutX="231.0" layoutY="42.0" mnemonicParsing="false" onAction="#nextButtonClick" prefHeight="14.0" prefWidth="70.0" text="Next" styleClass="controlButton" />
+                        <Button fx:id="chooseFileButton" layoutX="22.0" layoutY="266.0" mnemonicParsing="false" onAction="#chooseFileButtonClick" prefHeight="43.0" prefWidth="100.0" text="Choose File" styleClass="additionalButton" />
+                        <Button fx:id="choosePlaylistButton" layoutX="131.0" layoutY="266.0" mnemonicParsing="false" onAction="#choosePlaylistButtonClick" prefHeight="43.0" prefWidth="100.0" text="Choose playlist" styleClass="additionalButton" />
                         <Slider fx:id="timeSlider" layoutX="22.0" layoutY="189.0" prefHeight="14.0" prefWidth="282.0" />
                         <Label fx:id="labelSongDescription" layoutX="22.0" layoutY="131.0" prefHeight="43.0" prefWidth="282.0" text="Opis utworu" />
-                        <Button fx:id="connectButton" layoutX="239.0" layoutY="266.0" mnemonicParsing="false" onAction="#connectButtonClick" prefHeight="43.0" prefWidth="73.0" text="Connect" />
+                        <Button fx:id="connectButton" layoutX="239.0" layoutY="266.0" mnemonicParsing="false" onAction="#connectButtonClick" prefHeight="43.0" prefWidth="73.0" text="Connect" styleClass="additionalButton" />
+                        <Button layoutX="23.0" layoutY="82.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="Button" styleClass="controlButton" />
+                        <Button fx:id="repeatButton" layoutX="231.0" layoutY="82.0" mnemonicParsing="false" onAction="#repeatButtonClick" prefHeight="25.0" prefWidth="70.0" text="Repeat" styleClass="controlButton" />
                     </children>
                 </AnchorPane>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="225.0">
+                <AnchorPane fx:id="playlistPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="225.0">
                     <children>
                         <TableView fx:id="TablePlaylist" prefHeight="323.0" prefWidth="266.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <columns>

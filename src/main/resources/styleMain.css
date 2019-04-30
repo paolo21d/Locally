@@ -10,4 +10,45 @@
 }
 #controlPane {
     -fx-background-color: #494949;
+    -fx-text-fill: #ffffff;
+
 }
+.controlButton {
+    -fx-background-color: #318fe8;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+}
+.controlButton:hover{
+    -fx-background-color: #1868af;
+}
+.controlButton:pressed{
+    -fx-background-color: #074678;
+}
+
+#playPauseButton{
+    -fx-background-color: #c3073f;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+}
+#playPauseButton:hover{
+    -fx-background-color: #9a1750;
+}
+#playPauseButton:pressed{
+    -fx-background-color: #800530
+}
+
+.additionalButton{
+    -fx-background-color: #1868af;
+    -fx-text-fill: #ffffff;
+}
+.additionalButton:hover{
+      -fx-background-color: #105592;
+}
+.additionalButton:pressed{
+    -fx-background-color: #074678;
+}
+
+#labelSongDescription{
+    -fx-text-fill: #ffffff;
+}
+
