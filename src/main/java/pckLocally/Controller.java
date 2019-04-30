@@ -1,5 +1,6 @@
 package pckLocally;
 
+import com.google.gson.Gson;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,6 +15,7 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
     private  MP3Player player= new MP3Player();
     Communication communication = new Communication(player);
+    AllPlaylists playlists = new AllPlaylists();
     boolean connection=false;
 
 
@@ -98,6 +100,21 @@ public class Controller implements Initializable {
         TimeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongTime"));
 
         TablePlaylist.setItems(observableList);
+
+        Playlist pl1 = new Playlist();
+        pl1.addSong(new Song("s1", "1"));
+        pl1.addSong(new Song("s2", "2"));
+
+        Playlist pl2 = new Playlist();
+        pl2.addSong(new Song("s3", "3"));
+        pl2.addSong(new Song("s4", "4"));
+
+        playlists.addPlaylist(pl1);
+        playlists.addPlaylist(pl2);
+
+        Gson json = new Gson();
+        String response = json.toJson(playlists);
+        //System.out.println(response);
     }
     ObservableList<Song> observableList = FXCollections.observableArrayList(
       new Song("Nazwa", "czas"),
