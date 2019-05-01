@@ -28,7 +28,7 @@ public class AllPlaylists {
     }
 
     public boolean writePlaylistsToFile(){
-        String path = new String("playlists.json");
+        String path = new String("/playlists.json");
         Gson json = new Gson();
         String response = json.toJson(this);
 
@@ -45,7 +45,7 @@ public class AllPlaylists {
         return true;
     }
     public boolean readPlaylistsFromFile(){
-        String path = new String("playlists.json");
+        String path = new String("/playlists.json");
         String data = new String("");
         try {
             File myObj = new File(path);

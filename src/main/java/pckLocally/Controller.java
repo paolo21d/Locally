@@ -1,6 +1,7 @@
 package pckLocally;
 
-import com.google.gson.Gson;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,12 +14,15 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-    private  MP3Player player= new MP3Player();
-    Communication communication = new Communication(player);
     AllPlaylists playlists = new AllPlaylists();
-    boolean connection=false;
-    boolean played=false;
-
+    boolean connection = false;
+    boolean played = false;
+    ObservableList<Song> observableList = FXCollections.observableArrayList(
+            new Song("Nazwa", "czas"),
+            new Song("Nazwa2", "czas2")
+    );
+    private MP3Player player = new MP3Player(this);
+    Communication communication = new Communication(player);
 
     @FXML
     private Button playPauseButton;
@@ -29,12 +33,17 @@ public class Controller implements Initializable {
     @FXML
     private Button choosePlaylistButton;
     @FXML
-    private Slider timeSlider;
-    @FXML
     private Label labelSongDescription;
     @FXML
     private Button connectButton;
-
+    @FXML
+    private Label labelTime;
+    @FXML
+    private Label labelVolume;
+    @FXML
+    private Slider timeSlider;
+    @FXML
+    private Slider volumeSlider;
     @FXML
     private TableView<Song> TablePlaylist;
     @FXML
@@ -42,11 +51,11 @@ public class Controller implements Initializable {
     @FXML
     private TableColumn<Song, String> TimeColumn;
 
-
     @FXML
     void chooseFileButtonClick(ActionEvent event) {
         player.setPath();
     }
+
     @FXML
     void choosePlaylistButtonClick(ActionEvent event) {
         System.out.println("CHOOSE PLAYLIST");
@@ -54,30 +63,30 @@ public class Controller implements Initializable {
 
     @FXML
     void connectButtonClick(ActionEvent event) {
-        if(!connection){
+        if (!connection) {
             communication.start();
-            connection=true;
+            connection = true;
         }
     }
 
     @FXML
     void playPauseButtonClick(ActionEvent event) {
-        if(!played){ //start play
+        if (!played) { //start play
             labelSongDescription.setText("Opening...");
-            try{
+            try {
                 player.play();
-            }catch(Exception e){
+            } catch (Exception e) {
                 labelSongDescription.setText("File Open Error. Choose right path to file...");
                 return;
             }
-            String [] fullPath = player.getPath().split("/");
-            String title = fullPath[fullPath.length-1];
+            String[] fullPath = player.getPath().split("/");
+            String title = fullPath[fullPath.length - 1];
             labelSongDescription.setText(title);
             playPauseButton.setText("Pause");
-            played=true;
-        }else { //pause, continue
+            played = true;
+        } else { //pause, continue
             boolean tmp = player.pause();
-            if(tmp)
+            if (tmp)
                 playPauseButton.setText("Play");
             else
                 playPauseButton.setText("Pause");
@@ -96,19 +105,20 @@ public class Controller implements Initializable {
 
     @FXML
     void repeatButtonClick(ActionEvent event) {
-        if(played){
+        if (played) {
             player.reload();
             playPauseButton.setText("Pause");
         }
     }
 
+    /////////////////INITIALIZE
     public void initialize(URL location, ResourceBundle resources) {
         SongColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongName"));
         TimeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongTime"));
 
         TablePlaylist.setItems(observableList);
 
-        Playlist pl1 = new Playlist();
+        /*Playlist pl1 = new Playlist();
         pl1.addSong(new Song("s1", "1"));
         pl1.addSong(new Song("s2", "2"));
 
@@ -121,10 +131,33 @@ public class Controller implements Initializable {
 
         Gson json = new Gson();
         String response = json.toJson(playlists);
-        //System.out.println(response);
+        //System.out.println(response);*/
+
+        volumeSlider.setValue(100);
+
+        timeSlider.valueProperty().addListener(new InvalidationListener() {
+            public void invalidated(Observable ov) {
+                if (timeSlider.isPressed() && played) {
+                    player.changeTime(timeSlider.getValue() / 100);
+                    //System.out.println(timeSlider.getValue());
+                }
+            }
+        });
+        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+            public void invalidated(Observable observable) {
+                if (volumeSlider.isPressed() && played) {
+                    double value = volumeSlider.getValue();
+                    player.setVolume(value / 100);
+                    labelVolume.setText(Integer.toString((int) value) + "%");
+                }else if(!played){
+                    volumeSlider.setValue(100);
+                }
+            }
+        });
     }
-    ObservableList<Song> observableList = FXCollections.observableArrayList(
-      new Song("Nazwa", "czas"),
-      new Song("Nazwa2", "czas2")
-    );
+
+    public void updateValuesTime() {
+        timeSlider.setValue(player.getCurrentDuration().toMillis() / player.getAllDuration().toMillis() * 100);
+        labelTime.setText(player.parseTime(player.getCurrentDuration()) + " / " + player.parseTime(player.getAllDuration()));
+    }
 }
