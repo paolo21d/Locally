@@ -5,11 +5,16 @@ import javafx.beans.property.SimpleStringProperty;
 public class Song {
     private SimpleStringProperty songName;
     private SimpleStringProperty songTime;
-    private SimpleStringProperty path;
+    private SimpleStringProperty songPath;
 
     public Song(String name, String time){
         songName= new SimpleStringProperty(name);
         songTime= new SimpleStringProperty(time);
+    }
+    public Song(String name, String time, String path){
+        songName= new SimpleStringProperty(name);
+        songTime= new SimpleStringProperty(time);
+        songPath=new SimpleStringProperty(path);
     }
 
     public String getSongName() {
@@ -28,11 +33,11 @@ public class Song {
         this.songTime = new SimpleStringProperty(songTime);
     }
 
-    public String getPath() {
-        return path.get();
+    public String getSongPath() {
+        return songPath.get();
     }
 
-    public void setPath(String path) {
-        this.path = new SimpleStringProperty(path);
+    public void setSongPath(String songPath) {
+        this.songPath = new SimpleStringProperty(songPath);
     }
 }

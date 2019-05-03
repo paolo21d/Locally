@@ -5,19 +5,32 @@ import java.util.ArrayList;
 public class Playlist {
     private ArrayList<Song> songs;
     private String plName;
-    private  int songsAmount=0;
+    private int songsAmount = 0;
 
-    Playlist(){
+    Playlist() {
         songs = new ArrayList<Song>();
-        songsAmount =0;
+        songsAmount = 0;
     }
 
     public int getSongsAmount() {
         return songsAmount;
     }
 
+    public int getIndexOfSong(String title) {
+        for (int i = 0; i < songs.size(); i++) {
+            if (songs.get(i).getSongName().equals(title))
+                return i;
+        }
+        return -1;
+    }
 
-    public void addSong(Song song){
+    public String getPathOfSong(int index) {
+        if (index >= songs.size())
+            return null;
+        return songs.get(index).getSongPath();
+    }
+
+    public void addSong(Song song) {
         songs.add(song);
         songsAmount++;
     }

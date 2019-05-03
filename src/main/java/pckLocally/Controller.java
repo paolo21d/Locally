@@ -10,7 +10,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -18,13 +21,11 @@ public class Controller implements Initializable {
     AllPlaylists playlists = new AllPlaylists();
     boolean connection = false;
     boolean played = false;
-    ObservableList<Song> observableList = FXCollections.observableArrayList(
-            new Song("Nazwa", "czas"),
-            new Song("Nazwa2", "czas2")
-    );
+    ObservableList<Song> observableList = FXCollections.observableArrayList();
+    Playlist playlist = new Playlist();
+    int currentlyPlayedSongIndex = 0;
     private MP3Player player = new MP3Player(this);
     Communication communication = new Communication(player);
-
     @FXML
     private Button playPauseButton;
     @FXML
@@ -54,12 +55,32 @@ public class Controller implements Initializable {
 
     @FXML
     void chooseFileButtonClick(ActionEvent event) {
-        player.setPath();
+        /*FileChooser fc = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MUSIC files (.mp3)", "*.mp3");
+        fc.getExtensionFilters().add(extFilter);
+        File file = fc.showOpenDialog(null);
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "/");
+        player.setPath(path);*/
+
+        String path;
+        FileChooser fc = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MUSIC files (.mp3)", "*.mp3");
+        fc.getExtensionFilters().add(extFilter);
+        File file = fc.showOpenDialog(null);
+        path = file.getAbsolutePath().replace("\\", "/");
+        String[] fullPath = path.split("/");
+        String title = fullPath[fullPath.length - 1];
+
+        Song song = new Song(title, "-", path);
+        TablePlaylist.getItems().add(song);
+        playlist.addSong(song);
     }
 
     @FXML
     void choosePlaylistButtonClick(ActionEvent event) {
         System.out.println("CHOOSE PLAYLIST");
+
     }
 
     @FXML
@@ -71,37 +92,43 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void playPauseButtonClick(ActionEvent event) {
-        if (!played) { //start play
-            labelSongDescription.setText("Opening...");
-            try {
-                player.play();
-            } catch (Exception e) {
-                labelSongDescription.setText("File Open Error. Choose right path to file...");
-                return;
-            }
-            String[] fullPath = player.getPath().split("/");
-            String title = fullPath[fullPath.length - 1];
-            labelSongDescription.setText(title);
-            playPauseButton.setText("Pause");
-            played = true;
-        } else { //pause, continue
-            boolean tmp = player.pause();
-            if (tmp)
-                playPauseButton.setText("Play");
-            else
-                playPauseButton.setText("Pause");
-        }
+    void playPauseButtonClick(ActionEvent event) throws InterruptedException {
+        playPause();
     }
 
     @FXML
     void nextButtonClick(ActionEvent event) {
         System.out.println("NEXT");
+        nextSong();
+    }
+
+    private void nextSong() {
+        int nextIndex = (currentlyPlayedSongIndex + 1) % playlist.getSongsAmount();
+        String path = playlist.getPathOfSong(nextIndex);
+        if (path != null) {
+            player.setPath(path);
+            played = false;
+            currentlyPlayedSongIndex = nextIndex;
+            playPause();
+        }
     }
 
     @FXML
     void prevButtonClick(ActionEvent event) {
         System.out.println("PREV");
+        prevSong();
+    }
+
+    private void prevSong() {
+        int nextIndex = (currentlyPlayedSongIndex - 1) % playlist.getSongsAmount();
+        if (currentlyPlayedSongIndex == 0) nextIndex = playlist.getSongsAmount() - 1;
+        String path = playlist.getPathOfSong(nextIndex);
+        if (path != null) {
+            player.setPath(path);
+            played = false;
+            currentlyPlayedSongIndex = nextIndex;
+            playPause();
+        }
     }
 
     @FXML
@@ -117,7 +144,10 @@ public class Controller implements Initializable {
         SongColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongName"));
         TimeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongTime"));
 
-        TablePlaylist.setItems(observableList);
+        //TablePlaylist.setItems(observableList);
+        Song initSong = new Song("ts22.mp3", "-", player.getPath());
+        TablePlaylist.getItems().add(initSong);
+        playlist.addSong(initSong);
 
         /*Playlist pl1 = new Playlist();
         pl1.addSong(new Song("s1", "1"));
@@ -150,7 +180,7 @@ public class Controller implements Initializable {
                     double value = volumeSlider.getValue();
                     player.setVolume(value / 100);
                     labelVolume.setText(Integer.toString((int) value) + "%");
-                }else if(!played){
+                } else if (!played) {
                     volumeSlider.setValue(100);
                 }
             }
@@ -160,6 +190,10 @@ public class Controller implements Initializable {
     public void updateValuesTime() {
         timeSlider.setValue(player.getCurrentDuration().toMillis() / player.getAllDuration().toMillis() * 100);
         labelTime.setText(player.parseTime(player.getCurrentDuration()) + " / " + player.parseTime(player.getAllDuration()));
+
+        if (player.getCurrentDuration() == player.getAllDuration()) { //koniec utworu
+
+        }
     }
 
     public void helpAbout(ActionEvent actionEvent) {
@@ -171,5 +205,48 @@ public class Controller implements Initializable {
         alert.setContentText("Author: Pawel Swiatkowski\nVersion: 1.0");
 
         alert.showAndWait();
+    }
+
+    public void menuPlaylistAddSongClicked(ActionEvent actionEvent) {
+    }
+
+    public void tableClicked(MouseEvent mouseEvent) {
+        if (mouseEvent.getClickCount() == 2) {
+            String title = TablePlaylist.getSelectionModel().getSelectedItem().getSongName();
+            String time = TablePlaylist.getSelectionModel().getSelectedItem().getSongTime();
+            String path = TablePlaylist.getSelectionModel().getSelectedItem().getSongPath();
+            System.out.println(title);
+            player.setPath(path);
+            played = false;
+            currentlyPlayedSongIndex = playlist.getIndexOfSong(title);
+            playPause();
+        }
+    }
+
+    private void playPause() {
+        if (!played) { //start play
+            labelSongDescription.setText("Opening...");
+            try {
+                player.play();
+            } catch (Exception e) {
+                labelSongDescription.setText("File Open Error. Choose right path to file...");
+                return;
+            }
+            String[] fullPath = player.getPath().split("/");
+            String title = fullPath[fullPath.length - 1];
+            labelSongDescription.setText(title);
+            //Thread.sleep(2000);
+            //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
+            //TablePlaylist.getItems().add(new Song(title, "unknown", player.getPath()));
+
+            playPauseButton.setText("Pause");
+            played = true;
+        } else { //pause, continue
+            boolean tmp = player.pause();
+            if (tmp)
+                playPauseButton.setText("Play");
+            else
+                playPauseButton.setText("Pause");
+        }
     }
 }

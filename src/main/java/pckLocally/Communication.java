@@ -86,6 +86,10 @@ public class Communication extends Thread {
                 } else if (message.equals("Command:PAUSE")) {
                     player.pause();
                     System.out.println("PAUSE");
+                } else if (message.equals("Command:NEXT")) {
+
+                } else if (message.equals("Command:PREV")) {
+
                 }
 
             } catch (SocketException e) {

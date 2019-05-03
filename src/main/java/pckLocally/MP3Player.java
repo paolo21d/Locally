@@ -4,14 +4,14 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
-import javafx.stage.FileChooser;
-import javafx.util.Duration;
 import javafx.scene.media.MediaPlayer.Status;
+import javafx.scene.media.MediaView;
+import javafx.util.Duration;
 
 import java.io.File;
 
 public class MP3Player {
+    Controller controller;
     private String path;
     private Duration duration = null;
     private Media media;
@@ -20,13 +20,13 @@ public class MP3Player {
     private boolean played = false;
     private boolean paused = false;
     private AllPlaylists playlists;
-    Controller controller;
 
     public MP3Player(Controller c) {
         path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
         controller = c;
     }
-    public MP3Player(){
+
+    public MP3Player() {
         path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
     }
 
@@ -83,16 +83,12 @@ public class MP3Player {
         mediaPlayer.seek(mediaPlayer.getStartTime());
     }
 
-    void setPath() {
-        FileChooser fc = new FileChooser();
-        //fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("*.mp3"));
-        File file = fc.showOpenDialog(null);
-        path = file.getAbsolutePath();
-        path = path.replace("\\", "/");
-    }
-
     String getPath() {
         return path;
+    }
+
+    void setPath(String path) {
+        this.path = path;
     }
 
     public Duration getAllDuration() {
@@ -106,10 +102,12 @@ public class MP3Player {
     void changeTime(Double val) {
         mediaPlayer.seek(duration.multiply(val));
     }
-    public Status getStatus(){
-        return  mediaPlayer.getStatus();
+
+    public Status getStatus() {
+        return mediaPlayer.getStatus();
     }
-    public void setVolume(double vol){
+
+    public void setVolume(double vol) {
         mediaPlayer.setVolume(vol);
     }
 
