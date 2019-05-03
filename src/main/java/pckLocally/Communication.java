@@ -1,11 +1,15 @@
 package pckLocally;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.*;
 import java.util.Random;
 
-public class Communication extends Thread{
+public class Communication extends Thread {
     private int communicationPort = 10000;
+    private int communicationPortTCP = 10001;
     private MP3Player player;
     private int pin;
 
@@ -13,18 +17,23 @@ public class Communication extends Thread{
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
-
     private String message;
-    Communication(MP3Player p){
+
+
+    Communication(MP3Player p) {
         player = p;
         Random generator = new Random();
-        pin = generator.nextInt(1000)+8999;
+        pin = generator.nextInt(1000) + 8999;
     }
-    int getPin(){
-        return  pin;
+
+    int getPin() {
+        return pin;
     }
+
     public void run() {
         System.out.println("Thread start");
+
+        //UDP - client is searching my IP address, I response to give him my IP address
         DatagramSocket udpSocket = null;
         try {
             udpSocket = new DatagramSocket(communicationPort);
@@ -40,7 +49,7 @@ public class Communication extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String sentence = new String( receivePacket.getData());
+        String sentence = new String(receivePacket.getData());
         System.out.println("RECEIVED: " + sentence);
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
@@ -53,72 +62,39 @@ public class Communication extends Thread{
             e.printStackTrace();
         }
 
-        while(true){
-            try {
-                udpSocket.receive(receivePacket);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            /*String msg1 = new String(receivePacket.getData());
-            //msg1 = msg1.replace(" ", "");
-            char m = msg1.charAt(0);
-            //System.out.println("RECEIVED:"+msg1+" length:"+msg1.length());
-
-            if(m == '1'){ //play
-                player.play();
-                System.out.println("PLAY");
-            }else if(m == '2'){ //pause
-                player.pause();
-            }else {
-                System.out.println("OTHER:"+msg1);
-            }*/
-
-
-            //byte
-            ObjectInputStream iStream = null;
-            String messageStr=null;
-            try {
-                iStream = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData()));
-                messageStr = (String) iStream.readObject();
-                iStream.close();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println(messageStr);
-            if(messageStr.equals("1")){
-                player.play();
-                System.out.println("PLAY");
-            }else if(messageStr.equals("2")){
-                player.pause();
-                System.out.println("PAUSE");
-            }
-        }
-        //create TCP communication
-        /*System.out.println("try to connect:");
+        /////////client has my IP address
+        //connect via TCP
         try {
-            serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(communicationPortTCP);
             clientSocket = serverSocket.accept();
-            System.out.println("connected");
+            System.out.println("Accepted");
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        while(true){
+        //we have connection
+        //out.println("Tak sie wysyla dane");
+        while (true) { //ciagle odbieram komendy i tylko na nie reaguje
+            System.out.println("Receiving...");
             try {
                 message = in.readLine();
+
+                if (message.equals("Command:PLAY")) {
+                    player.play();
+                    System.out.println("PLAY");
+                } else if (message.equals("Command:PAUSE")) {
+                    player.pause();
+                    System.out.println("PAUSE");
+                }
+
+            } catch (SocketException e) {
+                System.out.println("Connection lost...");
+                break;
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
 
-            if(message.equals("1")){ //play
-                player.play();
-            }else if(message.equals("2")){ //pause
-                player.pause();
-            }
-        }*/
     }
 }

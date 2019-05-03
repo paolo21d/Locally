@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
@@ -159,5 +160,16 @@ public class Controller implements Initializable {
     public void updateValuesTime() {
         timeSlider.setValue(player.getCurrentDuration().toMillis() / player.getAllDuration().toMillis() * 100);
         labelTime.setText(player.parseTime(player.getCurrentDuration()) + " / " + player.parseTime(player.getAllDuration()));
+    }
+
+    public void helpAbout(ActionEvent actionEvent) {
+        System.out.println("ABOUT");
+
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("About");
+        alert.setHeaderText("Locally - mp3 player which can be controlled by various devices.");
+        alert.setContentText("Author: Pawel Swiatkowski\nVersion: 1.0");
+
+        alert.showAndWait();
     }
 }
