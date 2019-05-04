@@ -13,6 +13,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
+
+
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,6 +26,7 @@ public class Controller implements Initializable {
     ObservableList<Song> observableList = FXCollections.observableArrayList();
     Playlist playlist = new Playlist();
     int currentlyPlayedSongIndex = 0;
+
     private MP3Player player = new MP3Player(this);
     Communication communication = new Communication(player);
     @FXML

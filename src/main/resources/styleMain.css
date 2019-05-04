@@ -51,4 +51,19 @@
 #labelSongDescription, #labelTime, #labelVolume{
     -fx-text-fill: #ffffff;
 }
+.slider{
 
+}
+
+
+.table-view{
+    -fx-background-color: #696969;
+    -fx-text-fill: #ffffff;
+}
+.table-row-cell:odd{
+    -fx-background-color: #A9A9A9;
+    -fx-text-fill: #ffffff;
+}.table-row-cell:even{
+    -fx-background-color: #808080;
+    -fx-text-fill: #ffffff;
+}

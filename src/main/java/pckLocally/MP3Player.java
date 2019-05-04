@@ -46,7 +46,7 @@ public class MP3Player {
         mediaPlayer = new MediaPlayer(media);
         //mediaPlayer.setAutoPlay(true);
         //mediaPlayer.play();
-        mediaView = new MediaView(mediaPlayer);
+        //mediaView = new MediaView(mediaPlayer);
         mediaPlayer.play();
 
 

@@ -90,6 +90,9 @@ public class Communication extends Thread {
 
                 } else if (message.equals("Command:PREV")) {
 
+
+
+
                 }
 
             } catch (SocketException e) {
