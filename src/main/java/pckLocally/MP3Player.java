@@ -5,37 +5,46 @@ import javafx.beans.Observable;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
-import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.util.Random;
 
 public class MP3Player {
     Controller controller;
+    //boolean loopPlaylist = true;
+    public LoopType loopType = LoopType.RepeatAll;
     private String path;
     private Duration duration = null;
     private Media media;
     private MediaPlayer mediaPlayer;
-    private MediaView mediaView;
     private boolean played = false;
     private boolean paused = false;
-    private AllPlaylists playlists;
+    private AllPlaylists playlists = new AllPlaylists();
+    private Playlist currentPlaylist;
+    private int currentlyPlayedSongIndex = 0;
+    private MediaPlayer localMediaPlayer;
+
 
     public MP3Player(Controller c) {
         path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
         controller = c;
+        playlists.readPlaylistsFromFile();
+        currentPlaylist = playlists.getPlaylistByName("default");
     }
 
     public MP3Player() {
         path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
     }
 
-    void play() {
+    public enum LoopType{
+        RepeatAll, RepeatOne, Random;
+    }
+    boolean play() {
         if (path == null) {
             System.out.println("Path is null");
-            return;
+            return false;
         }
-
         if (mediaPlayer != null) {
             MediaPlayer.Status status = mediaPlayer.getStatus();
             System.out.println(status);
@@ -44,9 +53,6 @@ public class MP3Player {
         played = true;
         media = new Media(new File(path).toURI().toString());
         mediaPlayer = new MediaPlayer(media);
-        //mediaPlayer.setAutoPlay(true);
-        //mediaPlayer.play();
-        //mediaView = new MediaView(mediaPlayer);
         mediaPlayer.play();
 
 
@@ -54,18 +60,33 @@ public class MP3Player {
             public void run() {
                 duration = mediaPlayer.getMedia().getDuration();
                 System.out.println("Czas trwania " + parseTime(duration));
-
+                currentPlaylist.getSongByIndex(currentlyPlayedSongIndex).setSongTime(parseTime(duration));
             }
         });
 
         mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable observable) {
                 controller.updateValuesTime();
+                if (getAllDuration().toMillis() - getCurrentDuration().toMillis() <= 500) { //koniec utworu
+                    System.out.println("End song");
+                    if(loopType == LoopType.RepeatAll){
+                        controller.nextSong();
+                    }else if(loopType==LoopType.RepeatOne){
+                        reload();
+                    }else{ // random
+                        //TODO Usprawnic losowa kolejnosc
+                        Random generator = new Random();
+                        int rand = generator.nextInt() % currentPlaylist.getSongsAmount();
+                        for(int i=0; i<rand; ++i)
+                            controller.nextSong();
+                    }
+                }
             }
         });
 
         mediaPlayer.setVolume(1);
         //path = String.valueOf(duration);
+        return true;
     }
 
     boolean pause() {
@@ -87,7 +108,7 @@ public class MP3Player {
         return path;
     }
 
-    void setPath(String path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -116,46 +137,55 @@ public class MP3Player {
         int seconds = (int) d.toSeconds();
         seconds = seconds - minutes * 60;
 
-        String time = Integer.toString(minutes) + ":";
+        String time = minutes + ":";
         if (seconds < 10) time += "0";
         time += Integer.toString(seconds);
         return time;
     }
-    /*public boolean writePlaylistsToFile(){
-        String path = new String("playlists.json");
-        Gson json = new Gson();
-        String response = json.toJson(playlists);
 
-        try {
-            FileWriter myWriter = new FileWriter(path);
-            myWriter.write(response);
-            myWriter.close();
-            System.out.println("Successfully wrote to the file.");
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-            return  false;
-        }
-        return true;
+    public Playlist getCurrentPlaylist() {
+        return currentPlaylist;
     }
-    public boolean readPlaylistsFromFile(){
-        String path = new String("playlists.json");
-        String data = new String("");
-        try {
-            File myObj = new File(path);
-            Scanner myReader = new Scanner(myObj);
-            while (myReader.hasNextLine()) {
-                data += myReader.nextLine();
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-            return  false;
-        }
 
-        Gson json = new Gson();
-        playlists = json.fromJson(data, AllPlaylists.class);
-        return true;
-    }*/
+    public boolean addSongToCurrentPlaylist(Song song) {
+        boolean result = currentPlaylist.addSong(song);
+        if (result) {
+            Media localMedia = new Media(new File(song.getSongPath()).toURI().toString());
+            localMediaPlayer = new MediaPlayer(localMedia);
+
+            localMediaPlayer.setOnReady(new Runnable() {
+                public void run() {
+                    Duration localDuration = localMediaPlayer.getMedia().getDuration();
+                    System.out.println("Czas dodanego: " + parseTime(localDuration));
+                    //song.setSongTime(parseTime(localDuration));
+                    currentPlaylist.getSongByIndex(currentPlaylist.getSongsAmount() - 1).setSongTime(parseTime(localDuration));
+                }
+            });
+        }
+        return result;
+    }
+
+    public void nextSong() {
+        int nextIndex = (currentlyPlayedSongIndex + 1) % currentPlaylist.getSongsAmount();
+        String path = currentPlaylist.getPathOfSong(nextIndex);
+        if (path != null) {
+            setPath(path);
+            currentlyPlayedSongIndex = nextIndex;
+        }
+    }
+
+    public void prevSong() {
+        int nextIndex = (currentlyPlayedSongIndex - 1) % currentPlaylist.getSongsAmount();
+        if (currentlyPlayedSongIndex == 0) nextIndex = currentPlaylist.getSongsAmount() - 1;
+        String path = currentPlaylist.getPathOfSong(nextIndex);
+        if (path != null) {
+            setPath(path);
+            currentlyPlayedSongIndex = nextIndex;
+        }
+    }
+
+    public void setSong(String ti, String pt) {
+        setPath(pt);
+        currentlyPlayedSongIndex = currentPlaylist.getIndexOfSong(ti);
+    }
 }

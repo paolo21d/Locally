@@ -30,8 +30,28 @@ public class Playlist {
         return songs.get(index).getSongPath();
     }
 
-    public void addSong(Song song) {
+    public boolean addSong(Song song) {
+        for (Song sn : songs) {
+            if (sn.getSongPath().equals(song.getSongPath()) || sn.getSongName().equals(song.getSongName()))
+                return false;
+        }
         songs.add(song);
         songsAmount++;
+        return true;
+    }
+
+    public String getPlName() {
+        return plName;
+    }
+
+    public void setPlName(String plName) {
+        this.plName = plName;
+    }
+
+    public Song getSongByIndex(int index) {
+        if (index > songs.size() - 1)
+            return null;
+        else
+            return songs.get(index);
     }
 }

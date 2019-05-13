@@ -13,7 +13,7 @@ public class AllPlaylists {
     private ArrayList<Playlist> playlists;
     private int playlistsAmount = 0;
 
-    AllPlaylists(){
+    AllPlaylists() {
         playlists = new ArrayList<Playlist>();
         playlistsAmount = 0;
     }
@@ -22,13 +22,13 @@ public class AllPlaylists {
         return playlistsAmount;
     }
 
-    public void addPlaylist(Playlist pl){
+    public void addPlaylist(Playlist pl) {
         playlists.add(pl);
         playlistsAmount++;
     }
 
-    public boolean writePlaylistsToFile(){
-        String path = new String("/playlists.json");
+    public boolean writePlaylistsToFile() {
+        String path = new File("src/main/resources/playlists.json").getAbsolutePath();
         Gson json = new Gson();
         String response = json.toJson(this);
 
@@ -40,12 +40,13 @@ public class AllPlaylists {
         } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-            return  false;
+            return false;
         }
         return true;
     }
-    public boolean readPlaylistsFromFile(){
-        String path = new String("/playlists.json");
+
+    public boolean readPlaylistsFromFile() {
+        String path = new File("src/main/resources/playlists.json").getAbsolutePath();
         String data = new String("");
         try {
             File myObj = new File(path);
@@ -57,7 +58,7 @@ public class AllPlaylists {
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
-            return  false;
+            return false;
         }
 
         Gson json = new Gson();
@@ -65,5 +66,13 @@ public class AllPlaylists {
         this.playlists = tmp.playlists;
         this.playlistsAmount = tmp.playlistsAmount;
         return true;
+    }
+
+    public Playlist getPlaylistByName(String name) {
+        for(Playlist pl: playlists){
+            if (pl.getPlName().equals(name))
+                return  pl;
+        }
+        return null;
     }
 }
