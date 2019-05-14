@@ -251,5 +251,8 @@ public class Controller implements Initializable {
 
     }
 
+    public void volumeImageClicked(MouseEvent mouseEvent) {
+        //TODO napisac mute, volume, zmiane obrazka wraz ze zmiana volume slidera
+    }
 }
 
