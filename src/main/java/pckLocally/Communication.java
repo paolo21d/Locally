@@ -1,5 +1,7 @@
 package pckLocally;
 
+import com.google.gson.Gson;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +17,9 @@ public class Communication extends Thread {
     private final int receivePort = 10003;
     private Controller controller;
     private int pin;
+    private MP3Player.PlayerStatus status;
+    private SendThread sendThread;
+    private ReceiveThread receiveThread;
 
     /*private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -23,10 +28,11 @@ public class Communication extends Thread {
     private String message;*/
 
     //TODO  Zmienic komunikacje, caly czas bedzie wymiana danych
-    Communication(Controller c) {
+    Communication(Controller c, MP3Player.PlayerStatus st) {
         controller = c;
         Random generator = new Random();
         pin = generator.nextInt(1000) + 8999;
+        status = st;
     }
 
     int getPin() {
@@ -36,12 +42,13 @@ public class Communication extends Thread {
     public void run() {
         System.out.println("Thread start");
 
-        if (!initConnection()) { //nie udalo sie nawiazac polaczenia
+        /*if (!initConnection()) { //nie udalo sie nawiazac polaczenia
+        }*/
+        while(!initConnection());
+        //TODO dopisac zabezpieczenie polaczenia pinem wewnatrz initConnection
 
-        }
-
-        SendThread sendThread = new SendThread();
-        ReceiveThread receiveThread = new ReceiveThread();
+        sendThread = new SendThread();
+        receiveThread = new ReceiveThread();
         sendThread.start();
         receiveThread.start();
 
@@ -51,8 +58,6 @@ public class Communication extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
 //        connectTCP();
 //        while (true) { //ciagle odbieram komendy i tylko na nie reaguje
 //            System.out.println("Receiving...");
@@ -75,7 +80,11 @@ public class Communication extends Thread {
 //        }
 
     }
-
+    public void sendStatus(){
+        Gson json = new Gson();
+        String msg = json.toJson(status);
+        sendThread.send(msg);
+    }
     private boolean initConnection() {
         //UDP - client is searching my IP address, I response to give him my IP address
         DatagramSocket udpSocket = null;
@@ -160,6 +169,9 @@ public class Communication extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            Gson json = new Gson();
+            String msg = json.toJson(status);
+            send(msg);
             /*while (keepConnect) {
 
             }*/

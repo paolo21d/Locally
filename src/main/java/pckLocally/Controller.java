@@ -25,11 +25,11 @@ public class Controller implements Initializable {
     boolean played = false;
     ObservableList<Song> observableList = FXCollections.observableArrayList();
     Playlist playlist = new Playlist();
-    Communication communication = new Communication(this);
     MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
     private double volumeValue;
     private boolean mute = false;
     private MP3Player player = new MP3Player(this);
+    Communication communication = new Communication(this, player.getStatus());
     @FXML
     private Button playPauseButton;
     @FXML
@@ -148,17 +148,17 @@ public class Controller implements Initializable {
         if (loopType == MP3Player.LoopType.RepeatAll) {
             //loopButton.setText("1Repeat");
             loopImage.setImage(new Image("/icons/repeatOne.png"));
-            player.loopType = MP3Player.LoopType.RepeatOne;
+            player.setRepeatMode(MP3Player.LoopType.RepeatOne);
             loopType = MP3Player.LoopType.RepeatOne;
         } else if (loopType == MP3Player.LoopType.RepeatOne) {
             //loopButton.setText("Random");
             loopImage.setImage(new Image("/icons/random.png"));
-            player.loopType = MP3Player.LoopType.Random;
+            player.setRepeatMode(MP3Player.LoopType.Random);
             loopType = MP3Player.LoopType.Random;
         } else { //loopType == Random
             //loopButton.setText("A Repeat");
             loopImage.setImage(new Image("/icons/repeatAll.png"));
-            player.loopType = MP3Player.LoopType.RepeatAll;
+            player.setRepeatMode(MP3Player.LoopType.RepeatAll);
             loopType = MP3Player.LoopType.RepeatAll;
         }
     }
@@ -239,12 +239,14 @@ public class Controller implements Initializable {
             String path = TablePlaylist.getSelectionModel().getSelectedItem().getSongPath();
             System.out.println(title);
 
-            player.setSong(title, path);
-            played = false;
-            playPause();
+            setSong(title,path);
         }
     }
-
+    public void setSong(String title, String path){
+        player.setSong(title, path);
+        played = false;
+        playPause();
+    }
     public void playPause() {
         if (!played) { //start play
             labelSongDescription.setText("Opening...");
