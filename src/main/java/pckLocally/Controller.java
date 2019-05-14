@@ -10,6 +10,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
@@ -18,15 +20,16 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-
     AllPlaylists playlists = new AllPlaylists();
     boolean connection = false;
     boolean played = false;
     ObservableList<Song> observableList = FXCollections.observableArrayList();
     Playlist playlist = new Playlist();
     Communication communication = new Communication(this);
-    private MP3Player player = new MP3Player(this);
     MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
+    private double volumeValue;
+    private boolean mute = false;
+    private MP3Player player = new MP3Player(this);
     @FXML
     private Button playPauseButton;
     @FXML
@@ -55,6 +58,13 @@ public class Controller implements Initializable {
     private TableColumn<Song, String> SongColumn;
     @FXML
     private TableColumn<Song, String> TimeColumn;
+    @FXML
+    private ImageView playPauseImage;
+    @FXML
+    private ImageView loopImage;
+    @FXML
+    private ImageView volumeIcon;
+
 
     @FXML
     void chooseFileButtonClick(ActionEvent event) {
@@ -71,7 +81,7 @@ public class Controller implements Initializable {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MUSIC files (.mp3)", "*.mp3");
         fc.getExtensionFilters().add(extFilter);
         File file = fc.showOpenDialog(null);
-        if(file == null)
+        if (file == null)
             return;
         path = file.getAbsolutePath().replace("\\", "/");
         String[] fullPath = path.split("/");
@@ -129,21 +139,25 @@ public class Controller implements Initializable {
     void repeatButtonClick(ActionEvent event) {
         if (played) {
             player.reload();
-            playPauseButton.setText("Pause");
+            //playPauseButton.setText("Pause");
+            playPauseImage.setImage(new Image("/icons/pause.png"));
         }
     }
 
     public void loopButtonClick(ActionEvent actionEvent) {
-        if (loopType == MP3Player.LoopType.RepeatAll){
-            loopButton.setText("1Repeat");
+        if (loopType == MP3Player.LoopType.RepeatAll) {
+            //loopButton.setText("1Repeat");
+            loopImage.setImage(new Image("/icons/repeatOne.png"));
             player.loopType = MP3Player.LoopType.RepeatOne;
             loopType = MP3Player.LoopType.RepeatOne;
-        }else if(loopType == MP3Player.LoopType.RepeatOne){
-            loopButton.setText("Random");
+        } else if (loopType == MP3Player.LoopType.RepeatOne) {
+            //loopButton.setText("Random");
+            loopImage.setImage(new Image("/icons/random.png"));
             player.loopType = MP3Player.LoopType.Random;
             loopType = MP3Player.LoopType.Random;
-        }else{ //loopType == Random
-            loopButton.setText("A Repeat");
+        } else { //loopType == Random
+            //loopButton.setText("A Repeat");
+            loopImage.setImage(new Image("/icons/repeatAll.png"));
             player.loopType = MP3Player.LoopType.RepeatAll;
             loopType = MP3Player.LoopType.RepeatAll;
         }
@@ -177,10 +191,22 @@ public class Controller implements Initializable {
         volumeSlider.valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable observable) {
                 if (volumeSlider.isPressed() && played) {
-                    double value = volumeSlider.getValue();
-                    player.setVolume(value / 100);
-                    labelVolume.setText(Integer.toString((int) value) + "%");
+                    volumeValue = volumeSlider.getValue();
+                    //volumeSlider.setValue(volumeValue);
+                    player.setVolume(volumeValue / 100);
+                    labelVolume.setText(Integer.toString((int) volumeValue) + "%");
+                    if (volumeValue == 0) {
+                        volumeIcon.setImage(new Image("/icons/volumeMute.png"));
+                        mute = true;
+                    } else if (volumeValue < 50) {
+                        volumeIcon.setImage(new Image("/icons/volumeLow.png"));
+                        mute = false;
+                    } else {
+                        volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
+                        mute = false;
+                    }
                 } else if (!played) {
+                    volumeValue = 100;
                     volumeSlider.setValue(100);
                 }
             }
@@ -235,24 +261,45 @@ public class Controller implements Initializable {
             //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
             //TablePlaylist.getItems().add(new Song(title, "unknown", player.getPath()));
 
-            playPauseButton.setText("Pause");
+            //playPauseButton.setText("Pause");
+            playPauseImage.setImage(new Image("/icons/pause.png"));
             played = true;
         } else { //pause, continue
             boolean tmp = player.pause();
             if (tmp)
-                playPauseButton.setText("Play");
+                //playPauseButton.setText("Play");
+                playPauseImage.setImage(new Image("/icons/play.png"));
             else
-                playPauseButton.setText("Pause");
+                //playPauseButton.setText("Pause");
+                playPauseImage.setImage(new Image("/icons/pause.png"));
         }
     }
 
-    public void setSongTimePalaylist(String time, String name){
+    public void setSongTimePalaylist(String time, String name) {
         TablePlaylist.getItems().iterator();
 
     }
 
     public void volumeImageClicked(MouseEvent mouseEvent) {
-        //TODO napisac mute, volume, zmiane obrazka wraz ze zmiana volume slidera
+        //TODO naprawic po wyciszeniu zeby wracalo do dobrego stanu
+        if (played && !mute) {
+            volumeValue = volumeSlider.getValue();
+            mute = true;
+            player.setVolume(0);
+            labelVolume.setText("0%");
+            volumeSlider.setValue(0);
+            volumeIcon.setImage(new Image("/icons/volumeMute.png"));
+        } else if (played && mute) {
+            player.setVolume(volumeValue / 100);
+            labelVolume.setText(Integer.toString((int) volumeValue) + "%");
+            volumeSlider.setValue(volumeValue / 100);
+            mute = false;
+            if (volumeValue < 50) {
+                volumeIcon.setImage(new Image("/icons/volumeLow.png"));
+            } else {
+                volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
+            }
+        }
     }
 }
 

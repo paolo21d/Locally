@@ -23,6 +23,7 @@ public class MP3Player {
     private AllPlaylists playlists = new AllPlaylists();
     private Playlist currentPlaylist;
     private int currentlyPlayedSongIndex = 0;
+    private double volumeValue = 1;
     private MediaPlayer localMediaPlayer;
 
 
@@ -84,7 +85,7 @@ public class MP3Player {
             }
         });
 
-        mediaPlayer.setVolume(1);
+        mediaPlayer.setVolume(volumeValue);
         //path = String.valueOf(duration);
         return true;
     }
@@ -130,6 +131,7 @@ public class MP3Player {
 
     public void setVolume(double vol) {
         mediaPlayer.setVolume(vol);
+        volumeValue = vol;
     }
 
     public String parseTime(Duration d) {
@@ -150,6 +152,7 @@ public class MP3Player {
     public boolean addSongToCurrentPlaylist(Song song) {
         boolean result = currentPlaylist.addSong(song);
         if (result) {
+            playlists.writePlaylistsToFile();
             Media localMedia = new Media(new File(song.getSongPath()).toURI().toString());
             localMediaPlayer = new MediaPlayer(localMedia);
 
