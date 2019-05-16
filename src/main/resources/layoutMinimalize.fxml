@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="mainMini" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pckLocally.ControllerMini">
+    <children>
+        <Button mnemonicParsing="false" onAction="#but1Click" text="Button1" />
+        <Button mnemonicParsing="false" text="Button2" />
+        <Button mnemonicParsing="false" text="Button3" />
+    </children>
+</VBox>

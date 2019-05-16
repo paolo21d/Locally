@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="350.0" maxWidth="600.0" minHeight="350.0" minWidth="600.0" prefHeight="350.0" prefWidth="600.0" styleClass="mainPane" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pckLocally.Controller">
+<VBox fx:id="mainBox" maxHeight="350.0" maxWidth="600.0" minHeight="350.0" minWidth="600.0" prefHeight="350.0" prefWidth="600.0" styleClass="mainPane" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pckLocally.Controller">
 
 
     <children>
@@ -129,6 +129,8 @@
                                 <Image url="@icons/time.png" />
                             </image>
                         </ImageView>
+                  <Label fx:id="labelSpeed" layoutX="25.0" layoutY="123.0" text="Speed" />
+                  <Button fx:id="speedButton" layoutX="63.0" layoutY="119.0" mnemonicParsing="false" onAction="#speedButtonClick" prefHeight="25.0" prefWidth="52.0" styleClass="controlButton" text="x1" />
                     </children>
                 </AnchorPane>
                 <AnchorPane fx:id="playlistPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="225.0">

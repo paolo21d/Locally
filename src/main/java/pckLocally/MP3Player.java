@@ -53,6 +53,7 @@ public class MP3Player {
         media = new Media(new File(status.path).toURI().toString());
         mediaPlayer = new MediaPlayer(media);
         mediaPlayer.play();
+        mediaPlayer.setRate(status.rate);
 
 
         mediaPlayer.setOnReady(new Runnable() {
@@ -196,7 +197,15 @@ public class MP3Player {
     public void setTitle(String title){
         status.title = title;
     }
-
+    public void setRate(double r){
+        if(r<=0 || r>=5)
+            return;
+        status.rate = r;
+        mediaPlayer.setRate(r);
+    }
+    public double getRate(){
+        return status.rate;
+    }
     public enum LoopType {
         RepeatAll, RepeatOne, Random;
     }
@@ -212,6 +221,7 @@ public class MP3Player {
         public String path;
         public String title;
         public LoopType loopType = LoopType.RepeatAll;
+        public double rate =1;
     }
 
 }

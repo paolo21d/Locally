@@ -47,8 +47,11 @@
 .additionalButton:pressed{
     -fx-background-color: #074678;
 }
+#speedButton{
+    -fx-font-size: 12px;
+}
 
-#labelSongDescription, #labelTime, #labelVolume{
+#labelSongDescription, #labelTime, #labelVolume, #labelSpeed{
     -fx-text-fill: #ffffff;
 }
 .slider{

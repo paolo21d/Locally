@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
@@ -13,23 +14,30 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
+
+
     AllPlaylists playlists = new AllPlaylists();
     boolean connection = false;
     boolean played = false;
     ObservableList<Song> observableList = FXCollections.observableArrayList();
     Playlist playlist = new Playlist();
     MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
+    boolean inited = false;
     private double volumeValue;
     private boolean mute = false;
     private MP3Player player = new MP3Player(this);
     Communication communication = new Communication(this, player.getStatus());
+    @FXML
+    private VBox mainBox;
     @FXML
     private Button playPauseButton;
     @FXML
@@ -64,7 +72,8 @@ public class Controller implements Initializable {
     private ImageView loopImage;
     @FXML
     private ImageView volumeIcon;
-
+    @FXML
+    private Button speedButton;
 
     @FXML
     void chooseFileButtonClick(ActionEvent event) {
@@ -97,7 +106,13 @@ public class Controller implements Initializable {
     @FXML
     void choosePlaylistButtonClick(ActionEvent event) {
         System.out.println("CHOOSE PLAYLIST");
-
+        try {
+            VBox main2 = FXMLLoader.load(getClass().getResource("/layoutMinimalize.fxml"));
+            player.pause();
+            mainBox.getChildren().setAll(main2);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -179,40 +194,44 @@ public class Controller implements Initializable {
 
     /////////////////INITIALIZE
     public void initialize(URL location, ResourceBundle resources) {
-        SongColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongName"));
-        TimeColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongTime"));
+        if (!inited) {
+            inited = true;
+            SongColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongName"));
+            TimeColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongTime"));
 
-        //TablePlaylist.setItems(observableList);
-        //Song initSong = new Song("ts22xxx.mp3", "-", player.getPath());
-        //TablePlaylist.getItems().add(initSong);
-        //playlist.addSong(initSong);
+            //TablePlaylist.setItems(observableList);
+            //Song initSong = new Song("ts22xxx.mp3", "-", player.getPath());
+            //TablePlaylist.getItems().add(initSong);
+            //playlist.addSong(initSong);
 
-        playlist = player.getCurrentPlaylist();
-        if (playlist != null) {
-            for (int i = 0; i < playlist.getSongsAmount(); ++i) {
-                TablePlaylist.getItems().add(new SongTable(playlist.getSongByIndex(i)));
+            playlist = player.getCurrentPlaylist();
+            if (playlist != null) {
+                for (int i = 0; i < playlist.getSongsAmount(); ++i) {
+                    TablePlaylist.getItems().add(new SongTable(playlist.getSongByIndex(i)));
+                }
             }
+
+            volumeSlider.setValue(100);
+
+            timeSlider.valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov) {
+                    if (timeSlider.isPressed() && played) {
+                        changeTime();
+                    }
+                }
+            });
+            volumeSlider.valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable observable) {
+                    if (volumeSlider.isPressed() && played) {
+                        changeVolume();
+                    } else if (!played) {
+                        volumeValue = 100;
+                        volumeSlider.setValue(100);
+                    }
+                }
+            });
         }
 
-        volumeSlider.setValue(100);
-
-        timeSlider.valueProperty().addListener(new InvalidationListener() {
-            public void invalidated(Observable ov) {
-                if (timeSlider.isPressed() && played) {
-                    changeTime();
-                }
-            }
-        });
-        volumeSlider.valueProperty().addListener(new InvalidationListener() {
-            public void invalidated(Observable observable) {
-                if (volumeSlider.isPressed() && played) {
-                    changeVolume();
-                } else if (!played) {
-                    volumeValue = 100;
-                    volumeSlider.setValue(100);
-                }
-            }
-        });
     }
 
     public void updateValuesTime() {
@@ -333,6 +352,25 @@ public class Controller implements Initializable {
             }
         }
         communication.sendStatus();
+    }
+
+    public void speedButtonClick(ActionEvent actionEvent) {
+        if (player.getRate() == 1) {
+            player.setRate(1.5);
+            speedButton.setText("x1.5");
+        } else if (player.getRate() == 1.5) {
+            player.setRate(2);
+            speedButton.setText("x2");
+        } else if (player.getRate() == 2) {
+            player.setRate(0.5);
+            speedButton.setText("x0.5");
+        } else if (player.getRate() == 0.5) {
+            player.setRate(0.75);
+            speedButton.setText("x0.75");
+        } else if (player.getRate() == 0.75) {
+            player.setRate(1);
+            speedButton.setText("x1");
+        }
     }
 }
 
