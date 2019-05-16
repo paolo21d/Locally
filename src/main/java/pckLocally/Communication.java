@@ -2,7 +2,6 @@ package pckLocally;
 
 import com.google.gson.Gson;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,6 +19,7 @@ public class Communication extends Thread {
     private MP3Player.PlayerStatus status;
     private SendThread sendThread;
     private ReceiveThread receiveThread;
+    private boolean connected = false;
 
     /*private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -44,7 +44,7 @@ public class Communication extends Thread {
 
         /*if (!initConnection()) { //nie udalo sie nawiazac polaczenia
         }*/
-        while(!initConnection());
+        while (!initConnection()) ;
         //TODO dopisac zabezpieczenie polaczenia pinem wewnatrz initConnection
 
         sendThread = new SendThread();
@@ -80,11 +80,14 @@ public class Communication extends Thread {
 //        }
 
     }
-    public void sendStatus(){
+
+    public void sendStatus() {
         Gson json = new Gson();
         String msg = json.toJson(status);
-        sendThread.send(msg);
+        if (connected)
+            sendThread.send(msg);
     }
+
     private boolean initConnection() {
         //UDP - client is searching my IP address, I response to give him my IP address
         DatagramSocket udpSocket = null;
@@ -118,6 +121,7 @@ public class Communication extends Thread {
             return false;
         }
         /////////client has my IP address
+        connected = true;
         return true;
     }
 
@@ -200,24 +204,27 @@ public class Communication extends Thread {
 
             while (keepConnect) {
                 message = receive();
-                if(message == null){
+                if (message == null) {
                     System.out.println("Close communication");
-                    keepConnect=false;
+                    keepConnect = false;
                     break;
                 }
-                if (message.equals("Command:PLAY")) {
+                if (message.equals("Command:PLAYPAUSE")) {
                     controller.playPause();
                     //controller.playPauseButtonClick(new Event());
                     System.out.println("PLAY");
-                } else if (message.equals("Command:PAUSE")) {
-                    controller.playPause();
-                    System.out.println("PAUSE");
                 } else if (message.equals("Command:NEXT")) {
                     controller.nextSong();
                     System.out.println("NEXT");
                 } else if (message.equals("Command:PREV")) {
                     controller.prevSong();
                     System.out.println("PREV");
+                } else if (message.equals("Command:REPLAY")) {
+                    controller.repeat();
+                    System.out.println("REPEAT");
+                } else if (message.equals("Command:LOOP")) {
+                    controller.loopChange();
+                    System.out.println("LOOP");
                 }
             }
         }

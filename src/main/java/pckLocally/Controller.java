@@ -53,11 +53,11 @@ public class Controller implements Initializable {
     @FXML
     private Slider volumeSlider;
     @FXML
-    private TableView<Song> TablePlaylist;
+    private TableView<SongTable> TablePlaylist;
     @FXML
-    private TableColumn<Song, String> SongColumn;
+    private TableColumn<SongTable, String> SongColumn;
     @FXML
-    private TableColumn<Song, String> TimeColumn;
+    private TableColumn<SongTable, String> TimeColumn;
     @FXML
     private ImageView playPauseImage;
     @FXML
@@ -89,7 +89,9 @@ public class Controller implements Initializable {
 
         Song song = new Song(title, "-", path);
         if (player.addSongToCurrentPlaylist(song))
-            TablePlaylist.getItems().add(song);
+            TablePlaylist.getItems().add(new SongTable(song));
+
+        communication.sendStatus();
     }
 
     @FXML
@@ -117,10 +119,11 @@ public class Controller implements Initializable {
         nextSong();
     }
 
-    public void nextSong() {
+    public synchronized void nextSong() {
         player.nextSong();
         played = false;
         playPause();
+        //communication.sendStatus();
     }
 
     @FXML
@@ -129,22 +132,32 @@ public class Controller implements Initializable {
         prevSong();
     }
 
-    public void prevSong() {
+    public synchronized void prevSong() {
         player.prevSong();
         played = false;
         playPause();
+        //communication.sendStatus();
     }
 
     @FXML
     void repeatButtonClick(ActionEvent event) {
+        repeat();
+    }
+
+    public synchronized void repeat() {
         if (played) {
             player.reload();
             //playPauseButton.setText("Pause");
             playPauseImage.setImage(new Image("/icons/pause.png"));
+            communication.sendStatus();
         }
     }
 
     public void loopButtonClick(ActionEvent actionEvent) {
+        loopChange();
+    }
+
+    public synchronized void loopChange() {
         if (loopType == MP3Player.LoopType.RepeatAll) {
             //loopButton.setText("1Repeat");
             loopImage.setImage(new Image("/icons/repeatOne.png"));
@@ -161,12 +174,13 @@ public class Controller implements Initializable {
             player.setRepeatMode(MP3Player.LoopType.RepeatAll);
             loopType = MP3Player.LoopType.RepeatAll;
         }
+        communication.sendStatus();
     }
 
     /////////////////INITIALIZE
     public void initialize(URL location, ResourceBundle resources) {
-        SongColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongName"));
-        TimeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("SongTime"));
+        SongColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongName"));
+        TimeColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongTime"));
 
         //TablePlaylist.setItems(observableList);
         //Song initSong = new Song("ts22xxx.mp3", "-", player.getPath());
@@ -174,8 +188,10 @@ public class Controller implements Initializable {
         //playlist.addSong(initSong);
 
         playlist = player.getCurrentPlaylist();
-        for (int i = 0; i < playlist.getSongsAmount(); ++i) {
-            TablePlaylist.getItems().add(playlist.getSongByIndex(i));
+        if (playlist != null) {
+            for (int i = 0; i < playlist.getSongsAmount(); ++i) {
+                TablePlaylist.getItems().add(new SongTable(playlist.getSongByIndex(i)));
+            }
         }
 
         volumeSlider.setValue(100);
@@ -183,28 +199,14 @@ public class Controller implements Initializable {
         timeSlider.valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable ov) {
                 if (timeSlider.isPressed() && played) {
-                    player.changeTime(timeSlider.getValue() / 100);
-                    //System.out.println(timeSlider.getValue());
+                    changeTime();
                 }
             }
         });
         volumeSlider.valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable observable) {
                 if (volumeSlider.isPressed() && played) {
-                    volumeValue = volumeSlider.getValue();
-                    //volumeSlider.setValue(volumeValue);
-                    player.setVolume(volumeValue / 100);
-                    labelVolume.setText(Integer.toString((int) volumeValue) + "%");
-                    if (volumeValue == 0) {
-                        volumeIcon.setImage(new Image("/icons/volumeMute.png"));
-                        mute = true;
-                    } else if (volumeValue < 50) {
-                        volumeIcon.setImage(new Image("/icons/volumeLow.png"));
-                        mute = false;
-                    } else {
-                        volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
-                        mute = false;
-                    }
+                    changeVolume();
                 } else if (!played) {
                     volumeValue = 100;
                     volumeSlider.setValue(100);
@@ -216,6 +218,30 @@ public class Controller implements Initializable {
     public void updateValuesTime() {
         timeSlider.setValue(player.getCurrentDuration().toMillis() / player.getAllDuration().toMillis() * 100);
         labelTime.setText(player.parseTime(player.getCurrentDuration()) + " / " + player.parseTime(player.getAllDuration()));
+    }
+
+    public void changeTime() {
+        player.changeTime(timeSlider.getValue() / 100);
+        //System.out.println(timeSlider.getValue());
+        communication.sendStatus();
+    }
+
+    public void changeVolume() {
+        volumeValue = volumeSlider.getValue();
+        //volumeSlider.setValue(volumeValue);
+        player.setVolume(volumeValue / 100);
+        labelVolume.setText(Integer.toString((int) volumeValue) + "%");
+        if (volumeValue == 0) {
+            volumeIcon.setImage(new Image("/icons/volumeMute.png"));
+            mute = true;
+        } else if (volumeValue < 50) {
+            volumeIcon.setImage(new Image("/icons/volumeLow.png"));
+            mute = false;
+        } else {
+            volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
+            mute = false;
+        }
+        communication.sendStatus();
     }
 
     public void helpAbout(ActionEvent actionEvent) {
@@ -239,15 +265,17 @@ public class Controller implements Initializable {
             String path = TablePlaylist.getSelectionModel().getSelectedItem().getSongPath();
             System.out.println(title);
 
-            setSong(title,path);
+            setSong(title, path);
         }
     }
-    public void setSong(String title, String path){
+
+    public void setSong(String title, String path) {
         player.setSong(title, path);
         played = false;
         playPause();
     }
-    public void playPause() {
+
+    public synchronized void playPause() {
         if (!played) { //start play
             labelSongDescription.setText("Opening...");
             try {
@@ -259,6 +287,7 @@ public class Controller implements Initializable {
             String[] fullPath = player.getPath().split("/");
             String title = fullPath[fullPath.length - 1];
             labelSongDescription.setText(title);
+            player.setTitle(title);
             //Thread.sleep(2000);
             //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
             //TablePlaylist.getItems().add(new Song(title, "unknown", player.getPath()));
@@ -275,6 +304,7 @@ public class Controller implements Initializable {
                 //playPauseButton.setText("Pause");
                 playPauseImage.setImage(new Image("/icons/pause.png"));
         }
+        communication.sendStatus();
     }
 
     public void setSongTimePalaylist(String time, String name) {
@@ -302,6 +332,7 @@ public class Controller implements Initializable {
                 volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
             }
         }
+        communication.sendStatus();
     }
 }
 

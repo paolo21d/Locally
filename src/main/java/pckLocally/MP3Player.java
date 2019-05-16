@@ -31,7 +31,7 @@ public class MP3Player {
         status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
         controller = c;
         playlists.readPlaylistsFromFile();
-        status.currentPlaylist = playlists.getPlaylistByName("default");
+        status.currentPlaylist = playlists.getPlaylistByName("defaultPlaylist");
     }
 
     public MP3Player() {
@@ -49,6 +49,7 @@ public class MP3Player {
             mediaPlayer.pause();
         }
         status.played = true;
+        status.paused = false;
         media = new Media(new File(status.path).toURI().toString());
         mediaPlayer = new MediaPlayer(media);
         mediaPlayer.play();
@@ -192,6 +193,9 @@ public class MP3Player {
     public void setRepeatMode(MP3Player.LoopType type) {
         status.loopType = type;
     }
+    public void setTitle(String title){
+        status.title = title;
+    }
 
     public enum LoopType {
         RepeatAll, RepeatOne, Random;
@@ -206,6 +210,7 @@ public class MP3Player {
         public double volumeValue = 1;
         public int currentlyPlayedSongIndex = 0;
         public String path;
+        public String title;
         public LoopType loopType = LoopType.RepeatAll;
     }
 

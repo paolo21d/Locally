@@ -15,6 +15,9 @@ public class AllPlaylists {
 
     AllPlaylists() {
         playlists = new ArrayList<Playlist>();
+        Playlist defPl = new Playlist();
+        defPl.setPlName("defaultPlaylist");
+        addPlaylist(defPl);
         playlistsAmount = 0;
     }
 
@@ -60,11 +63,22 @@ public class AllPlaylists {
             e.printStackTrace();
             return false;
         }
-
+        if(data.equals("")){
+            return false;
+        }
         Gson json = new Gson();
         AllPlaylists tmp = json.fromJson(data, AllPlaylists.class);
+        if(tmp.playlists == null){
+//            playlists = new ArrayList<Playlist>();
+//            playlistsAmount = 0;
+            return false;
+        }
+
         this.playlists = tmp.playlists;
         this.playlistsAmount = tmp.playlistsAmount;
+        //playlists = new ArrayList<Playlist>();
+        //playlistsAmount = 0;
+
         return true;
     }
 
