@@ -4,13 +4,14 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaPlayer.Status;
 import javafx.util.Duration;
 
 import java.io.File;
 import java.util.Random;
 
 public class MP3Player {
+    private static MP3Player instance = null;
+
     //public LoopType loopType = LoopType.RepeatAll;
     Controller controller;
     //private String path;//
@@ -27,15 +28,26 @@ public class MP3Player {
     private PlayerStatus status = new PlayerStatus();
 
 
-    public MP3Player(Controller c) {
+    private MP3Player() {
         status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
-        controller = c;
+        //controller = c;
         playlists.readPlaylistsFromFile();
         status.currentPlaylist = playlists.getPlaylistByName("defaultPlaylist");
     }
 
-    public MP3Player() {
-        status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
+//    private MP3Player() {
+//        status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
+//    }
+
+    public static MP3Player getInstance() {
+        if (instance == null) {
+            instance = new MP3Player();
+        }
+        return instance;
+    }
+
+    public void setController(Controller c) {
+        controller = c;
     }
 
     boolean play() {
@@ -194,18 +206,22 @@ public class MP3Player {
     public void setRepeatMode(MP3Player.LoopType type) {
         status.loopType = type;
     }
-    public void setTitle(String title){
+
+    public void setTitle(String title) {
         status.title = title;
     }
-    public void setRate(double r){
-        if(r<=0 || r>=5)
+
+    public double getRate() {
+        return status.rate;
+    }
+
+    public void setRate(double r) {
+        if (r <= 0 || r >= 5)
             return;
         status.rate = r;
         mediaPlayer.setRate(r);
     }
-    public double getRate(){
-        return status.rate;
-    }
+
     public enum LoopType {
         RepeatAll, RepeatOne, Random;
     }
@@ -221,7 +237,7 @@ public class MP3Player {
         public String path;
         public String title;
         public LoopType loopType = LoopType.RepeatAll;
-        public double rate =1;
+        public double rate = 1;
     }
 
 }

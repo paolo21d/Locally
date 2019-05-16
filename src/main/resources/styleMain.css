@@ -25,15 +25,15 @@
     -fx-background-color: #074678;
 }
 
-#playPauseButton{
+.playPause{
     -fx-background-color: #c3073f;
     -fx-text-fill: #ffffff;
     -fx-font-size: 15px;
 }
-#playPauseButton:hover{
+.playPause:hover{
     -fx-background-color: #9a1750;
 }
-#playPauseButton:pressed{
+.playPause:pressed{
     -fx-background-color: #800530
 }
 
@@ -51,7 +51,7 @@
     -fx-font-size: 12px;
 }
 
-#labelSongDescription, #labelTime, #labelVolume, #labelSpeed{
+#labelSongDescription, #labelTime, #labelVolume, #labelSpeed, #labelInfo{
     -fx-text-fill: #ffffff;
 }
 .slider{

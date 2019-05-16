@@ -10,6 +10,8 @@ import java.net.*;
 import java.util.Random;
 
 public class Communication extends Thread {
+    private static Communication instance = null;
+
     private final int communicationPort = 10000;
     private final int communicationPortTCP = 10001;
     private final int sendPort = 10002;
@@ -28,10 +30,19 @@ public class Communication extends Thread {
     private String message;*/
 
     //TODO  Zmienic komunikacje, caly czas bedzie wymiana danych
-    Communication(Controller c, MP3Player.PlayerStatus st) {
-        controller = c;
+    private Communication() {
         Random generator = new Random();
         pin = generator.nextInt(1000) + 8999;
+    }
+
+    public static Communication getInstance() {
+        if (instance == null)
+            instance = new Communication();
+        return instance;
+    }
+
+    public void init(Controller c, MP3Player.PlayerStatus st) {
+        controller = c;
         status = st;
     }
 

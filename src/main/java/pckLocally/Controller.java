@@ -32,10 +32,10 @@ public class Controller implements Initializable {
     Playlist playlist = new Playlist();
     MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
     boolean inited = false;
+    //private MP3Player player = new MP3Player(this);
+    //Communication communication;
     private double volumeValue;
     private boolean mute = false;
-    private MP3Player player = new MP3Player(this);
-    Communication communication = new Communication(this, player.getStatus());
     @FXML
     private VBox mainBox;
     @FXML
@@ -75,6 +75,15 @@ public class Controller implements Initializable {
     @FXML
     private Button speedButton;
 
+    public Controller() {
+        MP3Player.getInstance().setController(this);
+        Communication.getInstance().init(this, MP3Player.getInstance().getStatus());
+//        if (MP3Player.getInstance().getStatus().played) {//
+//            playPauseImage.setImage(new Image("/icons/pause.png"));
+//            played = true;
+//        }
+    }
+
     @FXML
     void chooseFileButtonClick(ActionEvent event) {
         /*FileChooser fc = new FileChooser();
@@ -97,28 +106,22 @@ public class Controller implements Initializable {
         String title = fullPath[fullPath.length - 1];
 
         Song song = new Song(title, "-", path);
-        if (player.addSongToCurrentPlaylist(song))
+        if (MP3Player.getInstance().addSongToCurrentPlaylist(song))
             TablePlaylist.getItems().add(new SongTable(song));
 
-        communication.sendStatus();
+        Communication.getInstance().sendStatus();
     }
 
     @FXML
     void choosePlaylistButtonClick(ActionEvent event) {
         System.out.println("CHOOSE PLAYLIST");
-        try {
-            VBox main2 = FXMLLoader.load(getClass().getResource("/layoutMinimalize.fxml"));
-            player.pause();
-            mainBox.getChildren().setAll(main2);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @FXML
     void connectButtonClick(ActionEvent event) {
         if (!connection) {
-            communication.start();
+            Communication.getInstance().start();
             connection = true;
         }
     }
@@ -135,7 +138,7 @@ public class Controller implements Initializable {
     }
 
     public synchronized void nextSong() {
-        player.nextSong();
+        MP3Player.getInstance().nextSong();
         played = false;
         playPause();
         //communication.sendStatus();
@@ -148,7 +151,7 @@ public class Controller implements Initializable {
     }
 
     public synchronized void prevSong() {
-        player.prevSong();
+        MP3Player.getInstance().prevSong();
         played = false;
         playPause();
         //communication.sendStatus();
@@ -161,10 +164,10 @@ public class Controller implements Initializable {
 
     public synchronized void repeat() {
         if (played) {
-            player.reload();
+            MP3Player.getInstance().reload();
             //playPauseButton.setText("Pause");
             playPauseImage.setImage(new Image("/icons/pause.png"));
-            communication.sendStatus();
+            Communication.getInstance().sendStatus();
         }
     }
 
@@ -176,79 +179,85 @@ public class Controller implements Initializable {
         if (loopType == MP3Player.LoopType.RepeatAll) {
             //loopButton.setText("1Repeat");
             loopImage.setImage(new Image("/icons/repeatOne.png"));
-            player.setRepeatMode(MP3Player.LoopType.RepeatOne);
+            MP3Player.getInstance().setRepeatMode(MP3Player.LoopType.RepeatOne);
             loopType = MP3Player.LoopType.RepeatOne;
         } else if (loopType == MP3Player.LoopType.RepeatOne) {
             //loopButton.setText("Random");
             loopImage.setImage(new Image("/icons/random.png"));
-            player.setRepeatMode(MP3Player.LoopType.Random);
+            MP3Player.getInstance().setRepeatMode(MP3Player.LoopType.Random);
             loopType = MP3Player.LoopType.Random;
         } else { //loopType == Random
             //loopButton.setText("A Repeat");
             loopImage.setImage(new Image("/icons/repeatAll.png"));
-            player.setRepeatMode(MP3Player.LoopType.RepeatAll);
+            MP3Player.getInstance().setRepeatMode(MP3Player.LoopType.RepeatAll);
             loopType = MP3Player.LoopType.RepeatAll;
         }
-        communication.sendStatus();
+        Communication.getInstance().sendStatus();
     }
 
     /////////////////INITIALIZE
     public void initialize(URL location, ResourceBundle resources) {
-        if (!inited) {
-            inited = true;
-            SongColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongName"));
-            TimeColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongTime"));
+        if (MP3Player.getInstance().getStatus().played) {//
+            playPauseImage.setImage(new Image("/icons/pause.png"));
+            volumeSlider.setValue(MP3Player.getInstance().getStatus().volumeValue*100);
+            changeVolume();
+            volumeValue = volumeSlider.getValue(); //TODO naprawic slider po zmianie widoku
+            played = true;
+        }
 
-            //TablePlaylist.setItems(observableList);
-            //Song initSong = new Song("ts22xxx.mp3", "-", player.getPath());
-            //TablePlaylist.getItems().add(initSong);
-            //playlist.addSong(initSong);
+        inited = true;
+        SongColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongName"));
+        TimeColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongTime"));
 
-            playlist = player.getCurrentPlaylist();
-            if (playlist != null) {
-                for (int i = 0; i < playlist.getSongsAmount(); ++i) {
-                    TablePlaylist.getItems().add(new SongTable(playlist.getSongByIndex(i)));
+        //TablePlaylist.setItems(observableList);
+        //Song initSong = new Song("ts22xxx.mp3", "-", player.getPath());
+        //TablePlaylist.getItems().add(initSong);
+        //playlist.addSong(initSong);
+
+        playlist = MP3Player.getInstance().getCurrentPlaylist();
+        if (playlist != null) {
+            for (int i = 0; i < playlist.getSongsAmount(); ++i) {
+                TablePlaylist.getItems().add(new SongTable(playlist.getSongByIndex(i)));
+            }
+        }
+
+        volumeSlider.setValue(100);
+
+        timeSlider.valueProperty().addListener(new InvalidationListener() {
+            public void invalidated(Observable ov) {
+                if (timeSlider.isPressed() && played) {
+                    changeTime();
                 }
             }
-
-            volumeSlider.setValue(100);
-
-            timeSlider.valueProperty().addListener(new InvalidationListener() {
-                public void invalidated(Observable ov) {
-                    if (timeSlider.isPressed() && played) {
-                        changeTime();
-                    }
+        });
+        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+            public void invalidated(Observable observable) {
+                if (volumeSlider.isPressed() && played) {
+                    changeVolume();
+                } else if (!played) {
+                    volumeValue = 100;
+                    volumeSlider.setValue(100);
                 }
-            });
-            volumeSlider.valueProperty().addListener(new InvalidationListener() {
-                public void invalidated(Observable observable) {
-                    if (volumeSlider.isPressed() && played) {
-                        changeVolume();
-                    } else if (!played) {
-                        volumeValue = 100;
-                        volumeSlider.setValue(100);
-                    }
-                }
-            });
-        }
+            }
+        });
 
     }
 
     public void updateValuesTime() {
-        timeSlider.setValue(player.getCurrentDuration().toMillis() / player.getAllDuration().toMillis() * 100);
-        labelTime.setText(player.parseTime(player.getCurrentDuration()) + " / " + player.parseTime(player.getAllDuration()));
+        timeSlider.setValue(MP3Player.getInstance().getCurrentDuration().toMillis() / MP3Player.getInstance().getAllDuration().toMillis() * 100);
+        labelTime.setText(MP3Player.getInstance().parseTime(MP3Player.getInstance().getCurrentDuration()) + " / " + MP3Player.getInstance().parseTime(MP3Player.getInstance().getAllDuration()));
     }
 
     public void changeTime() {
-        player.changeTime(timeSlider.getValue() / 100);
+        MP3Player.getInstance().changeTime(timeSlider.getValue() / 100);
         //System.out.println(timeSlider.getValue());
-        communication.sendStatus();
+        Communication.getInstance().sendStatus();
     }
 
     public void changeVolume() {
         volumeValue = volumeSlider.getValue();
         //volumeSlider.setValue(volumeValue);
-        player.setVolume(volumeValue / 100);
+        MP3Player.getInstance().setVolume(volumeValue / 100);
         labelVolume.setText(Integer.toString((int) volumeValue) + "%");
         if (volumeValue == 0) {
             volumeIcon.setImage(new Image("/icons/volumeMute.png"));
@@ -260,7 +269,7 @@ public class Controller implements Initializable {
             volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
             mute = false;
         }
-        communication.sendStatus();
+        Communication.getInstance().sendStatus();
     }
 
     public void helpAbout(ActionEvent actionEvent) {
@@ -289,7 +298,7 @@ public class Controller implements Initializable {
     }
 
     public void setSong(String title, String path) {
-        player.setSong(title, path);
+        MP3Player.getInstance().setSong(title, path);
         played = false;
         playPause();
     }
@@ -298,15 +307,15 @@ public class Controller implements Initializable {
         if (!played) { //start play
             labelSongDescription.setText("Opening...");
             try {
-                player.play();
+                MP3Player.getInstance().play();
             } catch (Exception e) {
                 labelSongDescription.setText("File Open Error. Choose right path to file...");
                 return;
             }
-            String[] fullPath = player.getPath().split("/");
+            String[] fullPath = MP3Player.getInstance().getPath().split("/");
             String title = fullPath[fullPath.length - 1];
             labelSongDescription.setText(title);
-            player.setTitle(title);
+            MP3Player.getInstance().setTitle(title);
             //Thread.sleep(2000);
             //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
             //TablePlaylist.getItems().add(new Song(title, "unknown", player.getPath()));
@@ -315,7 +324,7 @@ public class Controller implements Initializable {
             playPauseImage.setImage(new Image("/icons/pause.png"));
             played = true;
         } else { //pause, continue
-            boolean tmp = player.pause();
+            boolean tmp = MP3Player.getInstance().pause();
             if (tmp)
                 //playPauseButton.setText("Play");
                 playPauseImage.setImage(new Image("/icons/play.png"));
@@ -323,7 +332,7 @@ public class Controller implements Initializable {
                 //playPauseButton.setText("Pause");
                 playPauseImage.setImage(new Image("/icons/pause.png"));
         }
-        communication.sendStatus();
+        Communication.getInstance().sendStatus();
     }
 
     public void setSongTimePalaylist(String time, String name) {
@@ -336,12 +345,12 @@ public class Controller implements Initializable {
         if (played && !mute) {
             volumeValue = volumeSlider.getValue();
             mute = true;
-            player.setVolume(0);
+            MP3Player.getInstance().setVolume(0);
             labelVolume.setText("0%");
             volumeSlider.setValue(0);
             volumeIcon.setImage(new Image("/icons/volumeMute.png"));
         } else if (played && mute) {
-            player.setVolume(volumeValue / 100);
+            MP3Player.getInstance().setVolume(volumeValue / 100);
             labelVolume.setText(Integer.toString((int) volumeValue) + "%");
             volumeSlider.setValue(volumeValue / 100);
             mute = false;
@@ -351,25 +360,35 @@ public class Controller implements Initializable {
                 volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
             }
         }
-        communication.sendStatus();
+        Communication.getInstance().sendStatus();
     }
 
     public void speedButtonClick(ActionEvent actionEvent) {
-        if (player.getRate() == 1) {
-            player.setRate(1.5);
+        if (MP3Player.getInstance().getRate() == 1) {
+            MP3Player.getInstance().setRate(1.5);
             speedButton.setText("x1.5");
-        } else if (player.getRate() == 1.5) {
-            player.setRate(2);
+        } else if (MP3Player.getInstance().getRate() == 1.5) {
+            MP3Player.getInstance().setRate(2);
             speedButton.setText("x2");
-        } else if (player.getRate() == 2) {
-            player.setRate(0.5);
+        } else if (MP3Player.getInstance().getRate() == 2) {
+            MP3Player.getInstance().setRate(0.5);
             speedButton.setText("x0.5");
-        } else if (player.getRate() == 0.5) {
-            player.setRate(0.75);
+        } else if (MP3Player.getInstance().getRate() == 0.5) {
+            MP3Player.getInstance().setRate(0.75);
             speedButton.setText("x0.75");
-        } else if (player.getRate() == 0.75) {
-            player.setRate(1);
+        } else if (MP3Player.getInstance().getRate() == 0.75) {
+            MP3Player.getInstance().setRate(1);
             speedButton.setText("x1");
+        }
+    }
+
+    public void minimalizeButtonClick(ActionEvent actionEvent) {
+        try {
+            VBox main2 = FXMLLoader.load(getClass().getResource("/layoutMinimalize.fxml"));
+            //MP3Player.getInstance().pause();
+            mainBox.getChildren().setAll(main2);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
