@@ -27,13 +27,16 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Playlists">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#deleteSongFromPlaylistClick" text="Delete" />
+                        <MenuItem mnemonicParsing="false" onAction="#menuDeleteSongFromPlaylistClick" text="Delete song" />
                         <MenuItem fx:id="menuPlaylistAddSong" mnemonicParsing="false" onAction="#menuPlaylistAddSongClicked" text="Add song to playlist" />
+                        <MenuItem mnemonicParsing="false" onAction="#menuChoosePlaylist" text="Choose playlist" />
+                        <MenuItem mnemonicParsing="false" onAction="#menuAddPlaylist" text="Add Playlist" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
                         <MenuItem fx:id="helpAbout" mnemonicParsing="false" onAction="#helpAbout" text="About" />
+                        <MenuItem mnemonicParsing="false" onAction="#helpConnect" text="How to connect?" />
                     </items>
                 </Menu>
             </menus>

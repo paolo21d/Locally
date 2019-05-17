@@ -63,12 +63,12 @@ public class AllPlaylists {
             e.printStackTrace();
             return false;
         }
-        if(data.equals("")){
+        if (data.equals("")) {
             return false;
         }
         Gson json = new Gson();
         AllPlaylists tmp = json.fromJson(data, AllPlaylists.class);
-        if(tmp.playlists == null){
+        if (tmp.playlists == null) {
 //            playlists = new ArrayList<Playlist>();
 //            playlistsAmount = 0;
             return false;
@@ -83,10 +83,14 @@ public class AllPlaylists {
     }
 
     public Playlist getPlaylistByName(String name) {
-        for(Playlist pl: playlists){
+        for (Playlist pl : playlists) {
             if (pl.getPlName().equals(name))
-                return  pl;
+                return pl;
         }
         return null;
+    }
+
+    public ArrayList<Playlist> getAllPlaylists() {
+        return playlists;
     }
 }

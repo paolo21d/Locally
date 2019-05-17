@@ -11,6 +11,11 @@ public class Playlist {
         songs = new ArrayList<Song>();
         songsAmount = 0;
     }
+    Playlist(String n) {
+        songs = new ArrayList<Song>();
+        songsAmount = 0;
+        plName = n;
+    }
 
     public int getSongsAmount() {
         return songsAmount;

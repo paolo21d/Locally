@@ -50,7 +50,12 @@ public class MP3Player {
     public void setController(Controller c) {
         controller = c;
     }
-
+    public AllPlaylists getPlaylists(){
+        return playlists;
+    }
+    public boolean pickPlaylist(String name){
+        return false;
+    }
     boolean play() {
         if (status.path == null) {
             System.out.println("Path is null");
@@ -210,6 +215,7 @@ public class MP3Player {
     public void setSong(String ti, String pt) {
         setPath(pt);
         status.currentlyPlayedSongIndex = status.currentPlaylist.getIndexOfSong(ti);
+        status.played = false;
     }
 
     public void setRepeatMode(MP3Player.LoopType type) {
