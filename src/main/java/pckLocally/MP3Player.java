@@ -50,12 +50,21 @@ public class MP3Player {
     public void setController(Controller c) {
         controller = c;
     }
-    public AllPlaylists getPlaylists(){
+
+    public AllPlaylists getPlaylists() {
         return playlists;
     }
-    public boolean pickPlaylist(String name){
-        return false;
+
+    public boolean pickPlaylist(String name) {
+        mediaPlayer = null;
+        status.played=false;
+        status.paused=false;
+        status.currentPlaylist = playlists.getPlaylistByName(name);
+        status.currentlyPlayedSongIndex=0;
+        status.path = null;
+        return true;
     }
+
     boolean play() {
         if (status.path == null) {
             System.out.println("Path is null");
@@ -68,13 +77,13 @@ public class MP3Player {
         }
 
         String file = new File(status.path).toURI().toString();
-        if(file==null)
+        if (file == null)
             return false;
         media = new Media(file);
-        if(media == null)
+        if (media == null)
             return false;
         mediaPlayer = new MediaPlayer(media);
-        if(mediaPlayer==null)
+        if (mediaPlayer == null)
             return false;
         mediaPlayer.play();
         mediaPlayer.setRate(status.rate);
@@ -236,15 +245,16 @@ public class MP3Player {
         status.rate = r;
         mediaPlayer.setRate(r);
     }
-    public boolean deleteSong(String title){
+
+    public boolean deleteSong(String title) {
         String saveCurrentTitle = status.currentPlaylist.getSongByIndex(status.currentlyPlayedSongIndex).getSongName();
-        if(saveCurrentTitle.equals(title)){
+        if (saveCurrentTitle.equals(title)) {
             return false;
         }
         status.currentPlaylist.deleteSongByTitle(title);
         ArrayList<Song> s = status.currentPlaylist.getAllSongs();
-        for(int i=0; i<s.size(); i++){
-            if(s.get(i).getSongName().equals(saveCurrentTitle)){
+        for (int i = 0; i < s.size(); i++) {
+            if (s.get(i).getSongName().equals(saveCurrentTitle)) {
                 status.currentlyPlayedSongIndex = i;
                 playlists.writePlaylistsToFile();
                 return true;

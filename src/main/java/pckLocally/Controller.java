@@ -99,7 +99,8 @@ public class Controller implements Initializable {
         addSongByClick();
 
     }
-    public void addSongByClick(){
+
+    public void addSongByClick() {
         String path;
         FileChooser fc = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MUSIC files (.mp3)", "*.mp3");
@@ -121,7 +122,7 @@ public class Controller implements Initializable {
     @FXML
     void choosePlaylistButtonClick(ActionEvent event) {
         System.out.println("CHOOSE PLAYLIST");
-
+        choosePlaylist();
     }
 
     @FXML
@@ -208,12 +209,12 @@ public class Controller implements Initializable {
         if (MP3Player.getInstance().getStatus().played) {//
             playPauseImage.setImage(new Image("/icons/pause.png"));
             labelSongDescription.setText(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
-            volumeSlider.setValue(MP3Player.getInstance().getStatus().volumeValue*100);
+            volumeSlider.setValue(MP3Player.getInstance().getStatus().volumeValue * 100);
             changeVolume();
             volumeValue = volumeSlider.getValue(); //TODO naprawic slider po zmianie widoku
             played = true;
         }
-        if(MP3Player.getInstance().getStatus().paused){
+        if (MP3Player.getInstance().getStatus().paused) {
             playPauseImage.setImage(new Image("/icons/play.png"));
         }
 
@@ -410,10 +411,10 @@ public class Controller implements Initializable {
 
     public void menuDeleteSongFromPlaylistClick(ActionEvent actionEvent) {
         List<String> choices = new ArrayList<String>();
-        for(Song s: MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()){
+        for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
             choices.add(s.getSongName());
         }
-        if(choices.size() == 0)
+        if (choices.size() == 0)
             return;
         ChoiceDialog<String> dialog = new ChoiceDialog<String>(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(0).getSongName(), choices);
         dialog.setTitle("Delete song");
@@ -421,12 +422,12 @@ public class Controller implements Initializable {
         dialog.setContentText("Song name: ");
 
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
+        if (result.isPresent()) {
             System.out.println("To delete: " + result.get());
             boolean r = MP3Player.getInstance().deleteSong(result.get());
-            if(r){
+            if (r) {
                 TablePlaylist.getItems().clear();
-                for(Song s: MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()){
+                for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
                     TablePlaylist.getItems().add(new SongTable(s));
                 }
             }
@@ -434,11 +435,14 @@ public class Controller implements Initializable {
     }
 
     public void menuChoosePlaylist(ActionEvent actionEvent) {
+        choosePlaylist();
+    }
+    public void choosePlaylist(){
         List<String> choices = new ArrayList<String>();
-        for(Playlist p: MP3Player.getInstance().getPlaylists().getAllPlaylists()){
+        for (Playlist p : MP3Player.getInstance().getPlaylists().getAllPlaylists()) {
             choices.add(p.getPlName());
         }
-        if(choices.size() == 0)
+        if (choices.size() == 0)
             return;
         ChoiceDialog<String> dialog = new ChoiceDialog<String>(MP3Player.getInstance().getPlaylists().getAllPlaylists().get(0).getPlName(), choices);
         dialog.setTitle("Choose Playlist");
@@ -446,15 +450,18 @@ public class Controller implements Initializable {
         dialog.setContentText("Playlist name: ");
 
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
+        if (result.isPresent()) {
             System.out.println("Chosen playlist: " + result.get());
+            MP3Player.getInstance().pause();
             boolean r = MP3Player.getInstance().pickPlaylist(result.get());
-            if(r){
+            if (r) {
                 TablePlaylist.getItems().clear();
-                for(Song s: MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()){
+                for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
                     TablePlaylist.getItems().add(new SongTable(s));
                 }
+                return;
             }
+            MP3Player.getInstance().play();
         }
     }
 
@@ -465,7 +472,7 @@ public class Controller implements Initializable {
         dialog.setContentText("Name:");
 
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
+        if (result.isPresent()) {
             System.out.println("Your name: " + result.get());
             AllPlaylists ap = MP3Player.getInstance().getPlaylists();
             Playlist p = new Playlist(result.get());

@@ -78,9 +78,9 @@ public class ControllerMini implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
-        if(MP3Player.getInstance().getStatus().played){
+        if (MP3Player.getInstance().getStatus().played) {
             labelInfo.setText(MP3Player.getInstance().getStatus().title);
-        }else{
+        } else {
             minPlayPauseImage.setImage(new Image("/icons/play.png"));
         }
     }

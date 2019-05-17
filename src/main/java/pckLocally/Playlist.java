@@ -11,11 +11,6 @@ public class Playlist {
         songs = new ArrayList<Song>();
         songsAmount = 0;
     }
-    Playlist(String n) {
-        songs = new ArrayList<Song>();
-        songsAmount = 0;
-        plName = n;
-    }
 
     Playlist(String name) {
         songs = new ArrayList<Song>();
