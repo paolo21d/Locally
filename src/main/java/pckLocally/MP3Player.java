@@ -7,6 +7,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MP3Player {
@@ -60,12 +61,20 @@ public class MP3Player {
             System.out.println(status);
             mediaPlayer.pause();
         }
-        status.played = true;
-        status.paused = false;
-        media = new Media(new File(status.path).toURI().toString());
+
+        String file = new File(status.path).toURI().toString();
+        if(file==null)
+            return false;
+        media = new Media(file);
+        if(media == null)
+            return false;
         mediaPlayer = new MediaPlayer(media);
+        if(mediaPlayer==null)
+            return false;
         mediaPlayer.play();
         mediaPlayer.setRate(status.rate);
+        status.played = true;
+        status.paused = false;
 
 
         mediaPlayer.setOnReady(new Runnable() {
@@ -220,6 +229,24 @@ public class MP3Player {
             return;
         status.rate = r;
         mediaPlayer.setRate(r);
+    }
+    public boolean deleteSong(String title){
+        String saveCurrentTitle = status.currentPlaylist.getSongByIndex(status.currentlyPlayedSongIndex).getSongName();
+        if(saveCurrentTitle.equals(title)){
+            return false;
+        }
+        status.currentPlaylist.deleteSongByTitle(title);
+        ArrayList<Song> s = status.currentPlaylist.getAllSongs();
+        for(int i=0; i<s.size(); i++){
+            if(s.get(i).getSongName().equals(saveCurrentTitle)){
+                status.currentlyPlayedSongIndex = i;
+                playlists.writePlaylistsToFile();
+                return true;
+            }
+        }
+        playlists.writePlaylistsToFile();
+        //TODO napisac co sie stanie jak sie usunelo jedyna piosenke
+        return false;
     }
 
     public enum LoopType {

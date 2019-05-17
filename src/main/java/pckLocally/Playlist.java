@@ -54,4 +54,18 @@ public class Playlist {
         else
             return songs.get(index);
     }
+    public ArrayList<Song> getAllSongs(){
+        return songs;
+    }
+
+    public boolean deleteSongByTitle(String title){
+        for(int i =0; i<songs.size(); i++){
+            if(songs.get(i).getSongName().equals(title)){
+                songs.remove(i);
+                songsAmount--;
+                return true;
+            }
+        }
+        return false;
+    }
 }

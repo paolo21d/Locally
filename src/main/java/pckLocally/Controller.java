@@ -20,6 +20,9 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -93,7 +96,10 @@ public class Controller implements Initializable {
         String path = file.getAbsolutePath();
         path = path.replace("\\", "/");
         player.setPath(path);*/
+        addSongByClick();
 
+    }
+    public void addSongByClick(){
         String path;
         FileChooser fc = new FileChooser();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MUSIC files (.mp3)", "*.mp3");
@@ -199,6 +205,7 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         if (MP3Player.getInstance().getStatus().played) {//
             playPauseImage.setImage(new Image("/icons/pause.png"));
+            labelSongDescription.setText(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
             volumeSlider.setValue(MP3Player.getInstance().getStatus().volumeValue*100);
             changeVolume();
             volumeValue = volumeSlider.getValue(); //TODO naprawic slider po zmianie widoku
@@ -284,6 +291,7 @@ public class Controller implements Initializable {
     }
 
     public void menuPlaylistAddSongClicked(ActionEvent actionEvent) {
+        addSongByClick();
     }
 
     public void tableClicked(MouseEvent mouseEvent) {
@@ -389,6 +397,31 @@ public class Controller implements Initializable {
             mainBox.getChildren().setAll(main2);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void deleteSongFromPlaylistClick(ActionEvent actionEvent) {
+        List<String> choices = new ArrayList<String>();
+        for(Song s: MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()){
+            choices.add(s.getSongName());
+        }
+        if(choices.size() == 0)
+            return;
+        ChoiceDialog<String> dialog = new ChoiceDialog<String>(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(0).getSongName(), choices);
+        dialog.setTitle("Delete song");
+        dialog.setHeaderText("Choose song, which you want to delete");
+        dialog.setContentText("Song name: ");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            System.out.println("To delete: " + result.get());
+            boolean r = MP3Player.getInstance().deleteSong(result.get());
+            if(r){
+                TablePlaylist.getItems().clear();
+                for(Song s: MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()){
+                    TablePlaylist.getItems().add(new SongTable(s));
+                }
+            }
         }
     }
 }
