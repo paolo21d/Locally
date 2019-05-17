@@ -46,11 +46,25 @@ public class MP3Player {
         }
         return instance;
     }
-
+    public boolean pickPlaylist(String name){
+        pause();
+        Playlist np = playlists.getPlaylistByName(name);
+        if(np==null)
+            return false;
+        status.currentPlaylist = np;
+        status.currentlyPlayedSongIndex =0;
+        return true;
+        //TODO dopracowac wybor playlisty
+    }
     public void setController(Controller c) {
         controller = c;
     }
-
+    public AllPlaylists getPlaylists(){
+        return playlists;
+    }
+    public void setPlaylists(AllPlaylists pl){
+        playlists = pl;
+    }
     boolean play() {
         if (status.path == null) {
             System.out.println("Path is null");

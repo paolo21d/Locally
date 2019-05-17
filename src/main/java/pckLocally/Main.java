@@ -7,12 +7,15 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    public static Scene scene;
+    public static Stage mainStage;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        mainStage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getResource("/layoutMain.fxml"));
         primaryStage.setTitle("Locally");
-        Scene scene = new Scene(root, 600, 350);
+        scene = new Scene(root, 600, 350);
         scene.getStylesheets().add(getClass().getResource("/styleMain.css").toExternalForm());
 
         primaryStage.setScene(scene);

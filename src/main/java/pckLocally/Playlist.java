@@ -12,6 +12,12 @@ public class Playlist {
         songsAmount = 0;
     }
 
+    Playlist(String name) {
+        songs = new ArrayList<Song>();
+        songsAmount = 0;
+        plName = name;
+    }
+
     public int getSongsAmount() {
         return songsAmount;
     }
@@ -54,13 +60,14 @@ public class Playlist {
         else
             return songs.get(index);
     }
-    public ArrayList<Song> getAllSongs(){
+
+    public ArrayList<Song> getAllSongs() {
         return songs;
     }
 
-    public boolean deleteSongByTitle(String title){
-        for(int i =0; i<songs.size(); i++){
-            if(songs.get(i).getSongName().equals(title)){
+    public boolean deleteSongByTitle(String title) {
+        for (int i = 0; i < songs.size(); i++) {
+            if (songs.get(i).getSongName().equals(title)) {
                 songs.remove(i);
                 songsAmount--;
                 return true;

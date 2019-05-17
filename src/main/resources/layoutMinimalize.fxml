@@ -1,51 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
-<VBox fx:id="mainMini" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="100.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="pckLocally.ControllerMini">
+
+<VBox fx:id="mainMini" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pckLocally.ControllerMini">
     <children>
         <MenuBar>
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close"/>
+                        <MenuItem mnemonicParsing="false" text="Close" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Delete"/>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="About"/>
+                        <MenuItem mnemonicParsing="false" text="About" />
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
         <AnchorPane prefHeight="200.0" prefWidth="200.0">
             <children>
-                <Button fx:id="miniPrev" layoutX="14.0" layoutY="11.0" mnemonicParsing="false"
-                        onAction="#miniPrevClick" styleClass="controlButton">
+                <Button fx:id="miniPrev" layoutX="14.0" layoutY="11.0" mnemonicParsing="false" onAction="#miniPrevClick" styleClass="controlButton">
                     <graphic>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@icons/prev.png"/>
+                                <Image url="@icons/prev.png" />
                             </image>
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button fx:id="minPlayPause" layoutX="82.0" layoutY="11.0" mnemonicParsing="false"
-                        onAction="#minPlayPauseClick" styleClass="playPause">
+                <Button fx:id="minPlayPause" layoutX="82.0" layoutY="11.0" mnemonicParsing="false" onAction="#minPlayPauseClick" styleClass="playPause">
                     <graphic>
-                        <ImageView fx:id="minPlayPauseImage" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true"
-                                   preserveRatio="true">
+                        <ImageView fx:id="minPlayPauseImage" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@icons/pause.png"/>
+                                <Image url="@icons/pause.png" />
                             </image>
                         </ImageView>
                     </graphic>
@@ -54,19 +55,17 @@
                     <graphic>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@icons/next.png"/>
+                                <Image url="@icons/next.png" />
                             </image>
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label fx:id="labelInfo" layoutX="14.0" layoutY="49.0" prefHeight="17.0" prefWidth="189.0"
-                       text="Label"/>
-                <Button fx:id="minChangeView" layoutX="211.0" layoutY="18.0" mnemonicParsing="false"
-                        onAction="#minChangeViewClick" prefHeight="25.0" prefWidth="35.0" styleClass="additionalButton">
+                <Label fx:id="labelInfo" layoutX="14.0" layoutY="54.0" prefHeight="17.0" prefWidth="231.0" text="Odtwórz utwór" />
+                <Button fx:id="minChangeView" layoutX="211.0" layoutY="18.0" mnemonicParsing="false" onAction="#minChangeViewClick" prefHeight="25.0" prefWidth="35.0" styleClass="additionalButton">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@icons/maximize.png"/>
+                                <Image url="@icons/maximize.png" />
                             </image>
                         </ImageView>
                     </graphic>

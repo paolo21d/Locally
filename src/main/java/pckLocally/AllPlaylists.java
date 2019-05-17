@@ -15,19 +15,26 @@ public class AllPlaylists {
 
     AllPlaylists() {
         playlists = new ArrayList<Playlist>();
-        Playlist defPl = new Playlist();
-        defPl.setPlName("defaultPlaylist");
-        addPlaylist(defPl);
-        playlistsAmount = 0;
+        //Playlist defPl = new Playlist();
+        //defPl.setPlName("defaultPlaylist");
+        //addPlaylist(defPl);
+        //playlistsAmount = 0;
+        //readPlaylistsFromFile();
     }
 
     public int getPlaylistsAmount() {
         return playlistsAmount;
     }
 
-    public void addPlaylist(Playlist pl) {
+    public boolean addPlaylist(Playlist pl) {
+        for(Playlist p: playlists){
+            if(p.getPlName().equals(pl.getPlName()))
+                return false;
+        }
         playlists.add(pl);
         playlistsAmount++;
+        writePlaylistsToFile();
+        return true;
     }
 
     public boolean writePlaylistsToFile() {
@@ -88,5 +95,8 @@ public class AllPlaylists {
                 return  pl;
         }
         return null;
+    }
+    public ArrayList<Playlist> getAllPlaylists(){
+        return playlists;
     }
 }

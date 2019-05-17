@@ -312,7 +312,7 @@ public class Controller implements Initializable {
     }
 
     public synchronized void playPause() {
-        if (!played) { //start play
+        if (!MP3Player.getInstance().getStatus().played) { //start play
             labelSongDescription.setText("Opening...");
             try {
                 MP3Player.getInstance().play();
@@ -394,13 +394,15 @@ public class Controller implements Initializable {
         try {
             VBox main2 = FXMLLoader.load(getClass().getResource("/layoutMinimalize.fxml"));
             //MP3Player.getInstance().pause();
+            Main.mainStage.setWidth(255);
+            Main.mainStage.setHeight(130);
             mainBox.getChildren().setAll(main2);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void deleteSongFromPlaylistClick(ActionEvent actionEvent) {
+    public void menuDeleteSongFromPlaylistClick(ActionEvent actionEvent) {
         List<String> choices = new ArrayList<String>();
         for(Song s: MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()){
             choices.add(s.getSongName());
@@ -423,6 +425,56 @@ public class Controller implements Initializable {
                 }
             }
         }
+    }
+
+    public void helpConnect(ActionEvent actionEvent) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("How to connect?");
+        alert.setHeaderText("Connection");
+        alert.setContentText("Firstly press in this application button connect (right bottom corner), next press connect button in client application.");
+
+        alert.showAndWait();
+    }
+
+    public void menuChoosePlaylist(ActionEvent actionEvent) {
+        List<String> choices = new ArrayList<String>();
+        for(Playlist p: MP3Player.getInstance().getPlaylists().getAllPlaylists()){
+            choices.add(p.getPlName());
+        }
+        if(choices.size() == 0)
+            return;
+        ChoiceDialog<String> dialog = new ChoiceDialog<String>(MP3Player.getInstance().getPlaylists().getAllPlaylists().get(0).getPlName(), choices);
+        dialog.setTitle("Choose Playlist");
+        dialog.setHeaderText("Choose playlist, which you want to play");
+        dialog.setContentText("Playlist name: ");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            System.out.println("Chosen playlist: " + result.get());
+            boolean r = MP3Player.getInstance().pickPlaylist(result.get());
+            if(r){
+                TablePlaylist.getItems().clear();
+                for(Song s: MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()){
+                    TablePlaylist.getItems().add(new SongTable(s));
+                }
+            }
+        }
+    }
+
+    public void menuAddPlaylist(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog("NewPlaylist");
+        dialog.setTitle("Add playlist");
+        dialog.setHeaderText("Input playlist name");
+        dialog.setContentText("Name:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            System.out.println("Your name: " + result.get());
+            AllPlaylists ap = MP3Player.getInstance().getPlaylists();
+            Playlist p = new Playlist(result.get());
+            ap.addPlaylist(p);
+        }
+
     }
 }
 
