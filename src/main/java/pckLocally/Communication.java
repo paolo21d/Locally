@@ -170,6 +170,10 @@ public class Communication extends Thread {
         return true;
     }*/
 
+    public enum MessageType {
+        PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS
+    }
+
     class SendThread extends Thread {
         boolean keepConnect = true;
         private Socket clientSocket;
@@ -185,7 +189,9 @@ public class Communication extends Thread {
                 e.printStackTrace();
             }
             Gson json = new Gson();
-            String msg = json.toJson(status);
+            //String msg = json.toJson(status);
+            Message message = new Message(MessageType.STATUS, status);
+            String msg = json.toJson(message);
             send(msg);
             /*while (keepConnect) {
 
@@ -199,7 +205,7 @@ public class Communication extends Thread {
 
     class ReceiveThread extends Thread {
         boolean keepConnect = true;
-        String message;
+        String msg;
         private Socket clientSocket;
         private BufferedReader in;
 
@@ -214,26 +220,28 @@ public class Communication extends Thread {
             }
 
             while (keepConnect) {
-                message = receive();
-                if (message == null) {
+                msg = receive();
+                if (msg == null) {
                     System.out.println("Close communication");
                     keepConnect = false;
                     break;
                 }
-                if (message.equals("Command:PLAYPAUSE")) {
+                Gson json = new Gson();
+                Message message = json.fromJson(msg, Message.class);
+                if (message.messageType == MessageType.PLAYPAUSE) {
                     controller.playPause();
                     //controller.playPauseButtonClick(new Event());
                     System.out.println("PLAY");
-                } else if (message.equals("Command:NEXT")) {
+                } else if (message.messageType == MessageType.NEXT) {
                     controller.nextSong();
                     System.out.println("NEXT");
-                } else if (message.equals("Command:PREV")) {
+                } else if (message.messageType == MessageType.PREV) {
                     controller.prevSong();
                     System.out.println("PREV");
-                } else if (message.equals("Command:REPLAY")) {
+                } else if (message.messageType == MessageType.REPLAY) {
                     controller.repeat();
                     System.out.println("REPEAT");
-                } else if (message.equals("Command:LOOP")) {
+                } else if (message.messageType == MessageType.LOOP) {
                     controller.loopChange();
                     System.out.println("LOOP");
                 }
@@ -257,8 +265,15 @@ public class Communication extends Thread {
     public class Message {
         MessageType messageType;
         String message;
-    }
-    public enum MessageType{
-        PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS
+        MP3Player.PlayerStatus statusMessage;
+
+        public Message(MessageType type, MP3Player.PlayerStatus st) {
+            messageType = type;
+            statusMessage = st;
+        }
+
+        public Message(MessageType type) {
+            messageType = type;
+        }
     }
 }

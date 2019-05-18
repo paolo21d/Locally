@@ -84,16 +84,16 @@ public class Controller implements Initializable {
 //            playPauseImage.setImage(new Image("/icons/pause.png"));
 //            played = true;
 //        }
-        timerTask = new TimerTask() {
-            @Override
-            public void run() {
-                if(MP3Player.getInstance().getStatus().played){
-                    labelSongDescription.setText(MP3Player.getInstance().getStatus().title);
-                    System.out.println("TIMER");
-                }
-            }
-        };
-        timer.schedule(timerTask, 500, 500);
+//        timerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                if(MP3Player.getInstance().getStatus().played){
+//                    labelSongDescription.setText(MP3Player.getInstance().getStatus().title);
+//                    System.out.println("TIMER");
+//                }
+//            }
+//        };
+//        timer.schedule(timerTask, 500, 500);
     }
 
     @FXML
