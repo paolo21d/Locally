@@ -253,4 +253,12 @@ public class Communication extends Thread {
             return msg;
         }
     }
+
+    public class Message {
+        MessageType messageType;
+        String message;
+    }
+    public enum MessageType{
+        PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS
+    }
 }

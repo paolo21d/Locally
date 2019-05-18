@@ -20,10 +20,7 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Controller implements Initializable {
 
@@ -39,6 +36,8 @@ public class Controller implements Initializable {
     //Communication communication;
     private double volumeValue;
     private boolean mute = false;
+    TimerTask timerTask;
+    Timer timer = new Timer();
     @FXML
     private VBox mainBox;
     @FXML
@@ -85,6 +84,16 @@ public class Controller implements Initializable {
 //            playPauseImage.setImage(new Image("/icons/pause.png"));
 //            played = true;
 //        }
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if(MP3Player.getInstance().getStatus().played){
+                    labelSongDescription.setText(MP3Player.getInstance().getStatus().title);
+                    System.out.println("TIMER");
+                }
+            }
+        };
+        timer.schedule(timerTask, 500, 500);
     }
 
     @FXML
@@ -328,7 +337,7 @@ public class Controller implements Initializable {
             }
             String[] fullPath = MP3Player.getInstance().getPath().split("/");
             String title = fullPath[fullPath.length - 1];
-            labelSongDescription.setText(title);
+            //labelSongDescription.setText(title);
             MP3Player.getInstance().setTitle(title);
             //Thread.sleep(2000);
             //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
