@@ -141,6 +141,10 @@ public class Controller implements Initializable {
             connection = true;
         }
     }
+    public void closeCommunication(){
+        connection = false;
+        Communication.getInstance().resetCommunication();
+    }
 
     @FXML
     void playPauseButtonClick(ActionEvent event) throws InterruptedException {
@@ -436,6 +440,9 @@ public class Controller implements Initializable {
         } else if (MP3Player.getInstance().getRate() == 0.75) {
             MP3Player.getInstance().setRate(1);
             speedButton.setText("x1");
+        } else{
+            MP3Player.getInstance().setRate(1);
+            speedButton.setText("x1");
         }
     }
 
@@ -551,6 +558,22 @@ public class Controller implements Initializable {
         MP3Player.getInstance().resetAppData();
         TablePlaylist.getItems().clear();
         labelSongDescription.setText("All data deleted.");
+    }
+
+    public void menuChangeRate(ActionEvent actionEvent) {
+        TextInputDialog dialog = new TextInputDialog("1");
+        dialog.setTitle("Set song rate");
+        dialog.setHeaderText("Ex.: 1; 1.4; 0.6");
+        dialog.setContentText("Please enter rate:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            Double val = Double.parseDouble(result.get());
+            if(val > 0 && val <3){
+                MP3Player.getInstance().setRate(val);
+                speedButton.setText(result.get());
+            }
+        }
     }
 }
 

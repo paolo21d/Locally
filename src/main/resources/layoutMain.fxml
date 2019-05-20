@@ -24,6 +24,7 @@
                     <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                   <MenuItem mnemonicParsing="false" onAction="#menuReset" text="Reset App Data" />
+                  <MenuItem mnemonicParsing="false" onAction="#menuChangeRate" text="Change song rate" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Playlists">

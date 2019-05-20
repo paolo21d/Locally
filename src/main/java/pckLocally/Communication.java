@@ -69,27 +69,6 @@ public class Communication extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        connectTCP();
-//        while (true) { //ciagle odbieram komendy i tylko na nie reaguje
-//            System.out.println("Receiving...");
-//            message = receiveData();
-//
-//            if (message.equals("Command:PLAY")) {
-//                controller.playPause();
-//                System.out.println("PLAY");
-//            } else if (message.equals("Command:PAUSE")) {
-//                controller.playPause();
-//                System.out.println("PAUSE");
-//            } else if (message.equals("Command:NEXT")) {
-//                controller.nextSong();
-//                System.out.println("NEXT");
-//            } else if (message.equals("Command:PREV")) {
-//                controller.prevSong();
-//                System.out.println("PREV");
-//            }
-//
-//        }
-
     }
 
     public void sendStatus() {
@@ -172,8 +151,12 @@ public class Communication extends Thread {
         return true;
     }*/
 
+    public void resetCommunication(){
+        sendThread = null;
+        receiveThread = null;
+    }
     public enum MessageType {
-        PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS, VOLMUTE, VOLDOWN, VOLUP, SETSONG
+        PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS, VOLMUTE, VOLDOWN, VOLUP, SETSONG, SETVOLUME
     }
 
     class SendThread extends Thread {
@@ -258,6 +241,9 @@ public class Communication extends Thread {
                     controller.setSong(title, path);
                 }
             }
+
+//            resetCommunication();
+            controller.closeCommunication();
         }
 
         public String receive() {
@@ -278,6 +264,7 @@ public class Communication extends Thread {
         MessageType messageType;
         String message;
         Song song;
+        Double volValue;
         MP3Player.PlayerStatus statusMessage;
 
         public Message(MessageType type, MP3Player.PlayerStatus st) {
