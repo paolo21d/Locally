@@ -94,7 +94,9 @@ public class Communication extends Thread {
 
     public void sendStatus() {
         Gson json = new Gson();
-        String msg = json.toJson(status);
+//        String msg = json.toJson(status);
+        Message message = new Message(MessageType.STATUS, status);
+        String msg = json.toJson(message);
         if (connected)
             sendThread.send(msg);
     }
@@ -171,7 +173,7 @@ public class Communication extends Thread {
     }*/
 
     public enum MessageType {
-        PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS
+        PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS, VOLMUTE, VOLDOWN, VOLUP, SETSONG
     }
 
     class SendThread extends Thread {
@@ -244,6 +246,16 @@ public class Communication extends Thread {
                 } else if (message.messageType == MessageType.LOOP) {
                     controller.loopChange();
                     System.out.println("LOOP");
+                } else if(message.messageType == MessageType.VOLMUTE){
+                    controller.volumeMute();
+                } else if(message.messageType == MessageType.VOLDOWN){
+                    controller.volumeDown();
+                }else if(message.messageType == MessageType.VOLUP){
+                    controller.volumeUp();
+                }else if(message.messageType == MessageType.SETSONG){
+                    String title = message.song.getSongName();
+                    String path = message.song.getSongPath();
+                    controller.setSong(title, path);
                 }
             }
         }
@@ -265,6 +277,7 @@ public class Communication extends Thread {
     public class Message {
         MessageType messageType;
         String message;
+        Song song;
         MP3Player.PlayerStatus statusMessage;
 
         public Message(MessageType type, MP3Player.PlayerStatus st) {

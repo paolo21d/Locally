@@ -30,7 +30,7 @@ public class MP3Player {
 
 
     private MP3Player() {
-        status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
+        //////status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
         //controller = c;
         playlists.readPlaylistsFromFile();
         status.currentPlaylist = playlists.getPlaylistByName("defaultPlaylist");
@@ -265,6 +265,13 @@ public class MP3Player {
         return false;
     }
 
+    public void resetAppData(){
+        playlists = null;
+        playlists = new AllPlaylists();
+        status = new PlayerStatus();
+        playlists.writePlaylistsToFile();
+    }
+
     public enum LoopType {
         RepeatAll, RepeatOne, Random;
     }
@@ -282,5 +289,6 @@ public class MP3Player {
         public LoopType loopType = LoopType.RepeatAll;
         public double rate = 1;
     }
+
 
 }

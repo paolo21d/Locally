@@ -18,7 +18,7 @@ public class AllPlaylists {
         Playlist defPl = new Playlist();
         defPl.setPlName("defaultPlaylist");
         addPlaylist(defPl);
-        playlistsAmount = 0;
+//        playlistsAmount = 0;
     }
 
     public int getPlaylistsAmount() {

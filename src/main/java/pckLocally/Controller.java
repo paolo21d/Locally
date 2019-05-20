@@ -32,12 +32,12 @@ public class Controller implements Initializable {
     Playlist playlist = new Playlist();
     MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
     boolean inited = false;
-    //private MP3Player player = new MP3Player(this);
-    //Communication communication;
-    private double volumeValue;
-    private boolean mute = false;
     TimerTask timerTask;
     Timer timer = new Timer();
+    //private MP3Player player = new MP3Player(this);
+    //Communication communication;
+    private double volumeValue; //range 0-100
+    private boolean mute = false;
     @FXML
     private VBox mainBox;
     @FXML
@@ -335,9 +335,11 @@ public class Controller implements Initializable {
                 labelSongDescription.setText("File Open Error. Choose right path to file...");
                 return;
             }
+            if (MP3Player.getInstance().getStatus().path == null || MP3Player.getInstance().getPath() == null)
+                return;
             String[] fullPath = MP3Player.getInstance().getPath().split("/");
             String title = fullPath[fullPath.length - 1];
-            //labelSongDescription.setText(title);
+            labelSongDescription.setText(title);
             MP3Player.getInstance().setTitle(title);
             //Thread.sleep(2000);
             //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
@@ -366,12 +368,7 @@ public class Controller implements Initializable {
     public void volumeImageClicked(MouseEvent mouseEvent) {
         //TODO naprawic po wyciszeniu zeby wracalo do dobrego stanu
         if (played && !mute) {
-            volumeValue = volumeSlider.getValue();
-            mute = true;
-            MP3Player.getInstance().setVolume(0);
-            labelVolume.setText("0%");
-            volumeSlider.setValue(0);
-            volumeIcon.setImage(new Image("/icons/volumeMute.png"));
+            volumeMute();
         } else if (played && mute) {
             MP3Player.getInstance().setVolume(volumeValue / 100);
             labelVolume.setText(Integer.toString((int) volumeValue) + "%");
@@ -383,6 +380,43 @@ public class Controller implements Initializable {
                 volumeIcon.setImage(new Image("/icons/volumeHigh.png"));
             }
         }
+        Communication.getInstance().sendStatus();
+    }
+
+    public void volumeMute() {
+        if (!played) return;
+        volumeValue = volumeSlider.getValue();
+        mute = true;
+        MP3Player.getInstance().setVolume(0);
+        labelVolume.setText("0%");
+        volumeSlider.setValue(0);
+        volumeIcon.setImage(new Image("/icons/volumeMute.png"));
+    }
+
+    public void volumeDown() {
+        if (!played) return;
+        if (mute) return;
+        if (volumeValue - 10 <= 0) {
+            volumeMute();
+        } else {
+            volumeValue -= 10;
+            MP3Player.getInstance().setVolume(volumeValue/100);
+            labelVolume.setText(Double.toString(volumeValue) + "%");
+            volumeSlider.setValue(volumeValue);
+        }
+        Communication.getInstance().sendStatus();
+    }
+
+    public void volumeUp() {
+        if (mute) {
+            mute = false;
+        }
+        volumeValue += 10;
+        if (volumeValue > 100)
+            volumeValue = 100;
+        MP3Player.getInstance().setVolume(volumeValue/100);
+        labelVolume.setText(Double.toString(volumeValue) + "%");
+        volumeSlider.setValue(volumeValue);
         Communication.getInstance().sendStatus();
     }
 
@@ -417,7 +451,6 @@ public class Controller implements Initializable {
         }
     }
 
-
     public void menuDeleteSongFromPlaylistClick(ActionEvent actionEvent) {
         List<String> choices = new ArrayList<String>();
         for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
@@ -446,7 +479,8 @@ public class Controller implements Initializable {
     public void menuChoosePlaylist(ActionEvent actionEvent) {
         choosePlaylist();
     }
-    public void choosePlaylist(){
+
+    public void choosePlaylist() {
         List<String> choices = new ArrayList<String>();
         for (Playlist p : MP3Player.getInstance().getPlaylists().getAllPlaylists()) {
             choices.add(p.getPlName());
@@ -496,6 +530,27 @@ public class Controller implements Initializable {
         alert.setContentText("Firstly press in this application button connect (right bottom corner), next press connect button in client application.");
 
         alert.showAndWait();
+    }
+
+    public void menuReset(ActionEvent actionEvent) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Reset Application Data");
+//        alert.setHeaderText("Look, a Confirmation Dialog");
+        alert.setContentText("Application data will be deleted, also saved playlists.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            //usun playlisty
+            resetAppData();
+        } else {
+            // nie ususwaj
+        }
+    }
+
+    private void resetAppData() {
+        MP3Player.getInstance().resetAppData();
+        TablePlaylist.getItems().clear();
+        labelSongDescription.setText("All data deleted.");
     }
 }
 
