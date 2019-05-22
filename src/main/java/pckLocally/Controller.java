@@ -47,8 +47,10 @@ public class Controller implements Initializable {
     private Button chooseFileButton;
     @FXML
     private Button choosePlaylistButton;
-    public Label labelSongDescription; //TODO zmienic na FXML
-    public Label labelConnectionStatus;
+    @FXML
+    private Label labelSongDescription;
+    @FXML
+    private Label labelConnectionStatus;
     @FXML
     private Button connectButton;
     @FXML

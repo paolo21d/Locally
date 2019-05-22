@@ -89,9 +89,6 @@ public class Communication extends Thread {
         } catch (SocketException e) {
             e.printStackTrace();
             return false;
-        }catch(Exception e){
-            System.out.println("PROBLEM INIT");
-            return false;
         }
         byte[] receiveData = new byte[1024];
         byte[] sendData = new byte[1024];
@@ -104,6 +101,8 @@ public class Communication extends Thread {
             return false;
         }
         String sentence = new String(receivePacket.getData());
+        sentence = sentence.substring(0, 4);
+//        String sentence = String.valueOf(receivePacket.getData());
         System.out.println("RECEIVED: " + sentence);
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
@@ -120,10 +119,10 @@ public class Communication extends Thread {
             return false;
         }
         /////////client has my IP address
-//        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
-//            connected = false;
-//            return false;
-//        }
+        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
+            connected = false;
+            return false;
+        }
         connected = true;
         return true;
     }
