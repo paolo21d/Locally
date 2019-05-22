@@ -58,7 +58,7 @@ public class Communication extends Thread {
         while (!initConnection()) ;
         //TODO dopisac zabezpieczenie polaczenia pinem wewnatrz initConnection
 
-        controller.comConnected();
+        //controller.comConnected();
         sendThread = new SendThread();
         receiveThread = new ReceiveThread();
         sendThread.start();
@@ -120,10 +120,10 @@ public class Communication extends Thread {
             return false;
         }
         /////////client has my IP address
-        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
-            connected = false;
-            return false;
-        }
+//        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
+//            connected = false;
+//            return false;
+//        }
         connected = true;
         return true;
     }
