@@ -58,6 +58,7 @@ public class Communication extends Thread {
         while (!initConnection()) ;
         //TODO dopisac zabezpieczenie polaczenia pinem wewnatrz initConnection
 
+        controller.comConnected();
         sendThread = new SendThread();
         receiveThread = new ReceiveThread();
         sendThread.start();
@@ -88,6 +89,9 @@ public class Communication extends Thread {
         } catch (SocketException e) {
             e.printStackTrace();
             return false;
+        }catch(Exception e){
+            System.out.println("PROBLEM INIT");
+            return false;
         }
         byte[] receiveData = new byte[1024];
         byte[] sendData = new byte[1024];
@@ -103,8 +107,11 @@ public class Communication extends Thread {
         System.out.println("RECEIVED: " + sentence);
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
-        String capitalizedSentence = sentence.toUpperCase();
-        sendData = capitalizedSentence.getBytes();
+        String messageToClinet = "CONNECTION";
+        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
+            messageToClinet = "NOCONNECTION";
+        }
+        sendData = messageToClinet.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
         try {
             udpSocket.send(sendPacket);
@@ -113,6 +120,10 @@ public class Communication extends Thread {
             return false;
         }
         /////////client has my IP address
+        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
+            connected = false;
+            return false;
+        }
         connected = true;
         return true;
     }
@@ -151,10 +162,11 @@ public class Communication extends Thread {
         return true;
     }*/
 
-    public void resetCommunication(){
+    public void resetCommunication() {
         sendThread = null;
         receiveThread = null;
     }
+
     public enum MessageType {
         PLAYPAUSE, NEXT, PREV, REPLAY, LOOP, STATUS, VOLMUTE, VOLDOWN, VOLUP, SETSONG, SETVOLUME
     }
@@ -229,13 +241,13 @@ public class Communication extends Thread {
                 } else if (message.messageType == MessageType.LOOP) {
                     controller.loopChange();
                     System.out.println("LOOP");
-                } else if(message.messageType == MessageType.VOLMUTE){
+                } else if (message.messageType == MessageType.VOLMUTE) {
                     controller.volumeMute();
-                } else if(message.messageType == MessageType.VOLDOWN){
+                } else if (message.messageType == MessageType.VOLDOWN) {
                     controller.volumeDown();
-                }else if(message.messageType == MessageType.VOLUP){
+                } else if (message.messageType == MessageType.VOLUP) {
                     controller.volumeUp();
-                }else if(message.messageType == MessageType.SETSONG){
+                } else if (message.messageType == MessageType.SETSONG) {
                     String title = message.song.getSongName();
                     String path = message.song.getSongPath();
                     controller.setSong(title, path);

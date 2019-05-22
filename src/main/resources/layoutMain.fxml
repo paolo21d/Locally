@@ -22,7 +22,7 @@
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
+                        <MenuItem mnemonicParsing="false" onAction="#menuClose" text="Close" />
                   <MenuItem mnemonicParsing="false" onAction="#menuReset" text="Reset App Data" />
                   <MenuItem mnemonicParsing="false" onAction="#menuChangeRate" text="Change song rate" />
                     </items>
@@ -145,6 +145,7 @@
                                 </ImageView>
                             </graphic>
                         </Button>
+                  <Label fx:id="labelConnectionStatus" alignment="CENTER" layoutX="228.0" layoutY="243.0" maxWidth="80.0" minWidth="80.0" text="No Connection" />
                     </children>
                 </AnchorPane>
                 <AnchorPane fx:id="playlistPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="225.0">

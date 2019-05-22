@@ -51,7 +51,7 @@
     -fx-font-size: 12px;
 }
 
-#labelSongDescription, #labelTime, #labelVolume, #labelSpeed, #labelInfo{
+#labelSongDescription, #labelTime, #labelVolume, #labelSpeed, #labelInfo, #labelConnectionStatus{
     -fx-text-fill: #ffffff;
 }
 .slider{

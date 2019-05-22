@@ -15,6 +15,7 @@ public class AllPlaylists {
 
     AllPlaylists() {
         playlists = new ArrayList<Playlist>();
+
         Playlist defPl = new Playlist();
         defPl.setPlName("defaultPlaylist");
         addPlaylist(defPl);

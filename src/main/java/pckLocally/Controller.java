@@ -23,8 +23,6 @@ import java.net.URL;
 import java.util.*;
 
 public class Controller implements Initializable {
-
-
     AllPlaylists playlists = new AllPlaylists();
     boolean connection = false;
     boolean played = false;
@@ -38,6 +36,7 @@ public class Controller implements Initializable {
     //Communication communication;
     private double volumeValue; //range 0-100
     private boolean mute = false;
+    String labelString;
     @FXML
     private VBox mainBox;
     @FXML
@@ -48,8 +47,8 @@ public class Controller implements Initializable {
     private Button chooseFileButton;
     @FXML
     private Button choosePlaylistButton;
-    @FXML
-    private Label labelSongDescription;
+    public Label labelSongDescription; //TODO zmienic na FXML
+    public Label labelConnectionStatus;
     @FXML
     private Button connectButton;
     @FXML
@@ -138,8 +137,12 @@ public class Controller implements Initializable {
     void connectButtonClick(ActionEvent event) {
         if (!connection) {
             Communication.getInstance().start();
+            labelConnectionStatus.setText("PIN:" + Integer.toString(Communication.getInstance().getPin()));
             connection = true;
         }
+    }
+    public void comConnected(){
+        labelConnectionStatus.setText("Connected");
     }
     public void closeCommunication(){
         connection = false;
@@ -267,6 +270,12 @@ public class Controller implements Initializable {
             }
         });
 
+        if(MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().size()!=0){
+            String title = MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().get(0).getSongName();
+            String path = MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().get(0).getSongPath();
+            setSong(title, path);
+            playPause();
+        }
     }
 
     public void updateValuesTime() {
@@ -568,12 +577,22 @@ public class Controller implements Initializable {
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
-            Double val = Double.parseDouble(result.get());
+            Double val = 1.0;
+            try{
+                val = Double.parseDouble(result.get());
+            }catch(Exception e){
+                return;
+            }
             if(val > 0 && val <3){
                 MP3Player.getInstance().setRate(val);
                 speedButton.setText(result.get());
             }
         }
+    }
+
+    public void menuClose(ActionEvent actionEvent) {
+        Main.mainStage.close();
+        System.exit(0);
     }
 }
 

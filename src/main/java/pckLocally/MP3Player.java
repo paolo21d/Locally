@@ -12,7 +12,6 @@ import java.util.Random;
 
 public class MP3Player {
     private static MP3Player instance = null;
-
     //public LoopType loopType = LoopType.RepeatAll;
     Controller controller;
     //private String path;//
@@ -47,6 +46,10 @@ public class MP3Player {
         return instance;
     }
 
+    public static void resetPlayer() {
+        instance = null;
+    }
+
     public void setController(Controller c) {
         controller = c;
     }
@@ -57,10 +60,10 @@ public class MP3Player {
 
     public boolean pickPlaylist(String name) {
         mediaPlayer = null;
-        status.played=false;
-        status.paused=false;
+        status.played = false;
+        status.paused = false;
         status.currentPlaylist = playlists.getPlaylistByName(name);
-        status.currentlyPlayedSongIndex=0;
+        status.currentlyPlayedSongIndex = 0;
         status.path = null;
         return true;
     }
@@ -265,7 +268,7 @@ public class MP3Player {
         return false;
     }
 
-    public void resetAppData(){
+    public void resetAppData() {
         playlists = null;
         playlists = new AllPlaylists();
         status = new PlayerStatus();
