@@ -282,9 +282,9 @@ public class Controller implements Initializable {
         });
         volumeSlider.valueProperty().addListener(new InvalidationListener() { //reakcja na przesuniecie volumeSlider
             public void invalidated(Observable observable) {
-                if (volumeSlider.isPressed() && played) {
+                if (volumeSlider.isPressed() && MP3Player.getInstance().getStatus().played) {
                     changeVolume();
-                } else if (!played) {
+                } else if (!MP3Player.getInstance().getStatus().played) {
                     volumeValue = 100;
                     volumeSlider.setValue(100);
                 }
@@ -327,6 +327,10 @@ public class Controller implements Initializable {
             mute = false;
         }
         Communication.getInstance().sendStatus();
+    }
+    public void setVolumeValue(double v){
+        volumeSlider.setValue(v);
+        changeVolume();
     }
 
     public void helpAbout(ActionEvent actionEvent) {

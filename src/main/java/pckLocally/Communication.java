@@ -200,7 +200,6 @@ public class Communication extends Thread {
                 Message message = json.fromJson(msg, Message.class);
                 if (message.messageType == MessageType.PLAYPAUSE) {
                     controller.playPause();
-                    //controller.playPauseButtonClick(new Event());
                     System.out.println("PLAY");
                 } else if (message.messageType == MessageType.NEXT) {
                     controller.nextSong();
@@ -224,6 +223,8 @@ public class Communication extends Thread {
                     String title = message.song.getSongName();
                     String path = message.song.getSongPath();
                     controller.setSong(title, path);
+                }else if(message.messageType == MessageType.SETVOLUME){
+                    controller.setVolumeValue(message.volValue);
                 }
             }
 
