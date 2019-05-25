@@ -152,8 +152,8 @@
                     <children>
                         <TableView fx:id="TablePlaylist" onMouseClicked="#tableClicked" prefHeight="323.0" prefWidth="266.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <columns>
-                                <TableColumn fx:id="SongColumn" prefWidth="174.0" text="Song" />
-                                <TableColumn fx:id="TimeColumn" minWidth="0.0" prefWidth="91.0" text="Time" />
+                                <TableColumn fx:id="SongColumn" editable="false" prefWidth="174.0" sortable="false" text="Song" />
+                                <TableColumn fx:id="TimeColumn" editable="false" minWidth="0.0" prefWidth="91.0" sortable="false" text="Time" />
                             </columns>
                         </TableView>
                     </children>

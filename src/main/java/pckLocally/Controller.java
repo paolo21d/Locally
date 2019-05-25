@@ -30,8 +30,8 @@ public class Controller implements Initializable {
     Playlist playlist = new Playlist();
     MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
     boolean inited = false;
-    TimerTask timerTask;
-    Timer timer = new Timer();
+//    TimerTask timerTask;
+//    Timer timer = new Timer();
     String labelString;
     //private MP3Player player = new MP3Player(this);
     //Communication communication;
@@ -273,14 +273,14 @@ public class Controller implements Initializable {
 
         volumeSlider.setValue(100);
 
-        timeSlider.valueProperty().addListener(new InvalidationListener() {
+        timeSlider.valueProperty().addListener(new InvalidationListener() { //reakcja na przesuniecie timeSlider
             public void invalidated(Observable ov) {
                 if (timeSlider.isPressed() && MP3Player.getInstance().getStatus().played) {
                     changeTime();
                 }
             }
         });
-        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+        volumeSlider.valueProperty().addListener(new InvalidationListener() { //reakcja na przesuniecie volumeSlider
             public void invalidated(Observable observable) {
                 if (volumeSlider.isPressed() && played) {
                     changeVolume();
@@ -291,7 +291,7 @@ public class Controller implements Initializable {
             }
         });
 
-        if (MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().size() != 0) {
+        if (MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().size() != 0 && !MP3Player.getInstance().getStatus().played) {
             String title = MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().get(0).getSongName();
             String path = MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().get(0).getSongPath();
             setSong(title, path);

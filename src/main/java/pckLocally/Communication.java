@@ -134,39 +134,6 @@ public class Communication extends Thread {
         return true;
     }
 
-    /*private boolean connectTCP() {
-        //connect via TCP
-        try {
-            serverSocket = new ServerSocket(communicationPortTCP);
-            clientSocket = serverSocket.accept();
-            System.out.println("Accepted");
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        //we have connection
-        return true;
-    }
-
-    private String receiveData() {
-        String msg = "";
-        try {
-            msg = in.readLine();
-        } catch (SocketException e) {
-            System.out.println("Connection lost...");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return msg;
-    }
-
-    private boolean sendData(String msg) {
-        //out.println("Tak sie wysyla dane");
-        out.println(msg);
-        return true;
-    }*/
 
     public void resetCommunication() {
         sendThread = null;
