@@ -12,18 +12,10 @@ import java.util.Random;
 
 public class MP3Player {
     private static MP3Player instance = null;
-    //public LoopType loopType = LoopType.RepeatAll;
-    Controller controller;
-    //private String path;//
-    //private Duration duration = null;//
+    private Controller controller;
     private Media media;
     private MediaPlayer mediaPlayer;
-    //private boolean played = false;//
-    //private boolean paused = false;//
     private AllPlaylists playlists = new AllPlaylists();
-    //private Playlist currentPlaylist;//
-    //private int currentlyPlayedSongIndex = 0;//
-    //private double volumeValue = 1;//
     private MediaPlayer localMediaPlayer;
     private PlayerStatus status = new PlayerStatus();
 
@@ -31,12 +23,11 @@ public class MP3Player {
     private MP3Player() {
         //////status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
         //controller = c;
-        playlists.readPlaylistsFromFile();
+        playlists.readPlaylistsFromFile("");
         status.currentPlaylist = playlists.getPlaylistByName("defaultPlaylist");
     }
 
 //    private MP3Player() {
-//        status.path = "C:/Users/paolo/Desktop/Java Start/MP3 V2/src/sample/TS22.mp3";
 //    }
 
     public static MP3Player getInstance() {
@@ -64,7 +55,10 @@ public class MP3Player {
         status.paused = false;
         status.currentPlaylist = playlists.getPlaylistByName(name);
         status.currentlyPlayedSongIndex = 0;
-        status.path = null;
+        if (status.currentPlaylist.getSongsAmount() != 0) {
+            status.path = status.currentPlaylist.getPathOfSong(0);
+        } else
+            status.path = null;
         return true;
     }
 
@@ -189,7 +183,7 @@ public class MP3Player {
     public boolean addSongToCurrentPlaylist(Song song) {
         boolean result = status.currentPlaylist.addSong(song);
         if (result) {
-            playlists.writePlaylistsToFile();
+            playlists.writePlaylistsToFile("");
             Media localMedia = new Media(new File(song.getSongPath()).toURI().toString());
             localMediaPlayer = new MediaPlayer(localMedia);
 
@@ -210,6 +204,7 @@ public class MP3Player {
         String path = status.currentPlaylist.getPathOfSong(nextIndex);
         if (path != null) {
             setPath(path);
+            setTitle(status.currentPlaylist.getSongByIndex(nextIndex).getSongName());
             status.currentlyPlayedSongIndex = nextIndex;
         }
     }
@@ -220,12 +215,14 @@ public class MP3Player {
         String path = status.currentPlaylist.getPathOfSong(nextIndex);
         if (path != null) {
             setPath(path);
+            setTitle(status.currentPlaylist.getSongByIndex(nextIndex).getSongName());
             status.currentlyPlayedSongIndex = nextIndex;
         }
     }
 
     public void setSong(String ti, String pt) {
         setPath(pt);
+        setTitle(ti);
         status.currentlyPlayedSongIndex = status.currentPlaylist.getIndexOfSong(ti);
         status.played = false;
     }
@@ -259,11 +256,11 @@ public class MP3Player {
         for (int i = 0; i < s.size(); i++) {
             if (s.get(i).getSongName().equals(saveCurrentTitle)) {
                 status.currentlyPlayedSongIndex = i;
-                playlists.writePlaylistsToFile();
+                playlists.writePlaylistsToFile("");
                 return true;
             }
         }
-        playlists.writePlaylistsToFile();
+        playlists.writePlaylistsToFile("");
         //TODO napisac co sie stanie jak sie usunelo jedyna piosenke
         return false;
     }
@@ -272,11 +269,11 @@ public class MP3Player {
         playlists = null;
         playlists = new AllPlaylists();
         status = new PlayerStatus();
-        playlists.writePlaylistsToFile();
+        playlists.writePlaylistsToFile("");
     }
 
     public enum LoopType {
-        RepeatAll, RepeatOne, Random;
+        RepeatAll, RepeatOne, Random
     }
 
     public class PlayerStatus {

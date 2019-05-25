@@ -22,7 +22,7 @@ public class Communication extends Thread {
     private SendThread sendThread;
     private ReceiveThread receiveThread;
     private boolean connected = false;
-
+    private DatagramSocket udpSocket;
     /*private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter out;
@@ -55,6 +55,18 @@ public class Communication extends Thread {
 
         /*if (!initConnection()) { //nie udalo sie nawiazac polaczenia
         }*/
+        udpSocket = null;
+        try {
+            udpSocket = new DatagramSocket(communicationPort);
+        } catch (SocketException e) {
+            e.printStackTrace();
+            controller.comNotConnected();
+            return;
+        }
+        if (udpSocket == null) {
+            controller.comNotConnected();
+            return;
+        }
         while (!initConnection()) ;
         //TODO dopisac zabezpieczenie polaczenia pinem wewnatrz initConnection
 
@@ -83,13 +95,7 @@ public class Communication extends Thread {
 
     private boolean initConnection() {
         //UDP - client is searching my IP address, I response to give him my IP address
-        DatagramSocket udpSocket = null;
-        try {
-            udpSocket = new DatagramSocket(communicationPort);
-        } catch (SocketException e) {
-            e.printStackTrace();
-            return false;
-        }
+
         byte[] receiveData = new byte[1024];
         byte[] sendData = new byte[1024];
 
@@ -106,9 +112,10 @@ public class Communication extends Thread {
         System.out.println("RECEIVED: " + sentence);
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
-        String messageToClinet = "CONNECTION";
+        String messageToClinet = "CONNECT";
         if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
-            messageToClinet = "NOCONNECTION";
+            System.out.println("INCORRECT PIN");
+            messageToClinet = "ERRORCN";
         }
         sendData = messageToClinet.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);

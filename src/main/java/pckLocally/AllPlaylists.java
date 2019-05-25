@@ -31,8 +31,12 @@ public class AllPlaylists {
         playlistsAmount++;
     }
 
-    public boolean writePlaylistsToFile() {
-        String path = new File("src/main/resources/playlists.json").getAbsolutePath();
+    public boolean writePlaylistsToFile(String argFile) {
+        String path;
+        if (argFile.equals(""))
+            path = new File("src/main/resources/playlists.json").getAbsolutePath();
+        else
+            path = "src/main/resources/" + argFile;
         Gson json = new Gson();
         String response = json.toJson(this);
 
@@ -49,8 +53,12 @@ public class AllPlaylists {
         return true;
     }
 
-    public boolean readPlaylistsFromFile() {
-        String path = new File("src/main/resources/playlists.json").getAbsolutePath();
+    public boolean readPlaylistsFromFile(String argFile) {
+        String path;
+        if (argFile.equals(""))
+            path = new File("src/main/resources/playlists.json").getAbsolutePath();
+        else
+            path = "src/main/resources/" + argFile;
         String data = new String("");
         try {
             File myObj = new File(path);

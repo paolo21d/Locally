@@ -32,11 +32,11 @@ public class Controller implements Initializable {
     boolean inited = false;
     TimerTask timerTask;
     Timer timer = new Timer();
+    String labelString;
     //private MP3Player player = new MP3Player(this);
     //Communication communication;
     private double volumeValue; //range 0-100
     private boolean mute = false;
-    String labelString;
     @FXML
     private VBox mainBox;
     @FXML
@@ -127,6 +127,17 @@ public class Controller implements Initializable {
             TablePlaylist.getItems().add(new SongTable(song));
 
         Communication.getInstance().sendStatus();
+
+        //odswiezenie listy po pewnym czasie, aby zaktualizowaly sie czasy trwania muzyki
+        TimerTask task = new TimerTask() {
+            public void run() {
+                System.out.println("REFRESH TABLE SONG");
+                refreshSongTable();
+            }
+        };
+        Timer timer = new Timer("Refresh Song Table");
+        long delay = 1000L;
+        timer.schedule(task, delay);
     }
 
     @FXML
@@ -143,10 +154,16 @@ public class Controller implements Initializable {
             connection = true;
         }
     }
-    public void comConnected(){
+
+    public void comConnected() {
         labelConnectionStatus.setText("Connected");
     }
-    public void closeCommunication(){
+
+    public void comNotConnected() {
+        connection = false;
+    }
+
+    public void closeCommunication() {
         connection = false;
         Communication.getInstance().resetCommunication();
     }
@@ -190,10 +207,12 @@ public class Controller implements Initializable {
     }
 
     public synchronized void repeat() {
-        if (played) {
+        if (MP3Player.getInstance().getStatus().played) {
             MP3Player.getInstance().reload();
-            //playPauseButton.setText("Pause");
-            playPauseImage.setImage(new Image("/icons/pause.png"));
+            if (MP3Player.getInstance().getStatus().paused)
+                playPauseImage.setImage(new Image("/icons/play.png"));
+            else
+                playPauseImage.setImage(new Image("/icons/pause.png"));
             Communication.getInstance().sendStatus();
         }
     }
@@ -256,7 +275,7 @@ public class Controller implements Initializable {
 
         timeSlider.valueProperty().addListener(new InvalidationListener() {
             public void invalidated(Observable ov) {
-                if (timeSlider.isPressed() && played) {
+                if (timeSlider.isPressed() && MP3Player.getInstance().getStatus().played) {
                     changeTime();
                 }
             }
@@ -272,11 +291,12 @@ public class Controller implements Initializable {
             }
         });
 
-        if(MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().size()!=0){
+        if (MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().size() != 0) {
             String title = MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().get(0).getSongName();
             String path = MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs().get(0).getSongPath();
             setSong(title, path);
             playPause();
+            played = false;
         }
     }
 
@@ -415,7 +435,7 @@ public class Controller implements Initializable {
             volumeMute();
         } else {
             volumeValue -= 10;
-            MP3Player.getInstance().setVolume(volumeValue/100);
+            MP3Player.getInstance().setVolume(volumeValue / 100);
             labelVolume.setText(Double.toString(volumeValue) + "%");
             volumeSlider.setValue(volumeValue);
         }
@@ -429,7 +449,7 @@ public class Controller implements Initializable {
         volumeValue += 10;
         if (volumeValue > 100)
             volumeValue = 100;
-        MP3Player.getInstance().setVolume(volumeValue/100);
+        MP3Player.getInstance().setVolume(volumeValue / 100);
         labelVolume.setText(Double.toString(volumeValue) + "%");
         volumeSlider.setValue(volumeValue);
         Communication.getInstance().sendStatus();
@@ -451,7 +471,7 @@ public class Controller implements Initializable {
         } else if (MP3Player.getInstance().getRate() == 0.75) {
             MP3Player.getInstance().setRate(1);
             speedButton.setText("x1");
-        } else{
+        } else {
             MP3Player.getInstance().setRate(1);
             speedButton.setText("x1");
         }
@@ -486,10 +506,7 @@ public class Controller implements Initializable {
             System.out.println("To delete: " + result.get());
             boolean r = MP3Player.getInstance().deleteSong(result.get());
             if (r) {
-                TablePlaylist.getItems().clear();
-                for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
-                    TablePlaylist.getItems().add(new SongTable(s));
-                }
+                refreshSongTable();
             }
         }
     }
@@ -513,16 +530,15 @@ public class Controller implements Initializable {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
             System.out.println("Chosen playlist: " + result.get());
-            MP3Player.getInstance().pause();
+            if (MP3Player.getInstance().getStatus().played && !MP3Player.getInstance().getStatus().paused)
+                MP3Player.getInstance().pause();
+            playPauseImage.setImage(new Image("/icons/play.png"));
             boolean r = MP3Player.getInstance().pickPlaylist(result.get());
             if (r) {
-                TablePlaylist.getItems().clear();
-                for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
-                    TablePlaylist.getItems().add(new SongTable(s));
-                }
+                refreshSongTable();
                 return;
             }
-            MP3Player.getInstance().play();
+            //MP3Player.getInstance().play();
         }
     }
 
@@ -578,14 +594,14 @@ public class Controller implements Initializable {
         dialog.setContentText("Please enter rate:");
 
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
+        if (result.isPresent()) {
             Double val = 1.0;
-            try{
+            try {
                 val = Double.parseDouble(result.get());
-            }catch(Exception e){
+            } catch (Exception e) {
                 return;
             }
-            if(val > 0 && val <3){
+            if (val > 0 && val < 3) {
                 MP3Player.getInstance().setRate(val);
                 speedButton.setText(result.get());
             }
@@ -595,6 +611,13 @@ public class Controller implements Initializable {
     public void menuClose(ActionEvent actionEvent) {
         Main.mainStage.close();
         System.exit(0);
+    }
+
+    public void refreshSongTable(){
+        TablePlaylist.getItems().clear();
+        for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
+            TablePlaylist.getItems().add(new SongTable(s));
+        }
     }
 }
 

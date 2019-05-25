@@ -31,7 +31,7 @@ public class Playlist {
     }
 
     public String getPathOfSong(int index) {
-        if (index >= songs.size())
+        if (index >= songs.size() || index<0)
             return null;
         return songs.get(index).getSongPath();
     }
@@ -55,7 +55,7 @@ public class Playlist {
     }
 
     public Song getSongByIndex(int index) {
-        if (index > songs.size() - 1)
+        if (index > songs.size() - 1 || index<0)
             return null;
         else
             return songs.get(index);
