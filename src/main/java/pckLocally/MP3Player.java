@@ -93,6 +93,7 @@ public class MP3Player {
                 status.allDuration = mediaPlayer.getMedia().getDuration();
                 System.out.println("Czas trwania " + parseTime(status.allDuration));
                 status.currentPlaylist.getSongByIndex(status.currentlyPlayedSongIndex).setSongTime(parseTime(status.allDuration)); //TODO ze zdalnego sterowania cos null
+                playlists.writePlaylistsToFile("");
             }
         });
 

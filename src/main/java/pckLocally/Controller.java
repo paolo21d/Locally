@@ -23,24 +23,21 @@ import java.net.URL;
 import java.util.*;
 
 public class Controller implements Initializable {
-    AllPlaylists playlists = new AllPlaylists();
-    boolean connection = false;
-    boolean played = false;
-    ObservableList<Song> observableList = FXCollections.observableArrayList();
-    Playlist playlist = new Playlist();
-    MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
-    boolean inited = false;
-    //    TimerTask timerTask;
-//    Timer timer = new Timer();
-    String labelString;
-    //private MP3Player player = new MP3Player(this);
-    //Communication communication;
-    private double volumeValue =100; //range 0-100
+    //private AllPlaylists playlists = new AllPlaylists();
+    private boolean connection = false;
+    private boolean played = false;
+    private ObservableList<Song> observableList = FXCollections.observableArrayList();
+    private Playlist playlist = new Playlist();
+    private MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
+    private boolean inited = false;
+
+    private LabelRefresher labelRefresher = new LabelRefresher();
+    private LabelRefresher connectStatusRefresher = new LabelRefresher();
+
+    private double volumeValue = 100; //range 0-100
     private boolean mute = false;
-
     private Thread updaterLabelThread;
-    LabelRefresher labelRefresher = new LabelRefresher();
-
+    private Thread updaterconnectStatus;
     @FXML
     private VBox mainBox;
     @FXML
@@ -154,13 +151,15 @@ public class Controller implements Initializable {
     void connectButtonClick(ActionEvent event) {
         if (!connection) {
             Communication.getInstance().start();
-            labelConnectionStatus.setText("PIN:" + Communication.getInstance().getPin());
+            //System.out.println(Communication.getInstance().getPin());
+            //labelConnectionStatus.setText("PIN:" + Communication.getInstance().getPin());
+            connectStatusRefresher.refresh("PIN:" + Communication.getInstance().getPin());
             connection = true;
         }
     }
 
     public void comConnected() {
-        labelConnectionStatus.setText("Connected");
+        connectStatusRefresher.refresh("Connected");
     }
 
     public void comNotConnected() {
@@ -170,6 +169,8 @@ public class Controller implements Initializable {
     public void closeCommunication() {
         connection = false;
         Communication.getInstance().resetCommunication();
+        connectStatusRefresher.refresh("Not connected");
+        Communication.getInstance().init(this, MP3Player.getInstance().getStatus());
     }
 
     @FXML
@@ -251,10 +252,14 @@ public class Controller implements Initializable {
         updaterLabelThread = new Thread(labelRefresher);
         updaterLabelThread.start();
 
+        labelConnectionStatus.textProperty().bind(connectStatusRefresher.messageProperty());
+        updaterconnectStatus = new Thread(connectStatusRefresher);
+        updaterconnectStatus.start();
+
         if (MP3Player.getInstance().getStatus().played) {//inicjalizacja po powrocie z widoku minimalizacji
             playPauseImage.setImage(new Image("/icons/pause.png"));
             //labelSongDescription.setText(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
-            labelSongDescription.setText(MP3Player.getInstance().getStatus().title);
+            refreshTitle(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
             volumeSlider.setValue(MP3Player.getInstance().getStatus().volumeValue * 100);
             volumeValue = volumeSlider.getValue(); //TODO naprawic slider po zmianie widoku
             changeVolume();
@@ -269,11 +274,6 @@ public class Controller implements Initializable {
         inited = true;
         SongColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongName"));
         TimeColumn.setCellValueFactory(new PropertyValueFactory<SongTable, String>("SongTime"));
-
-        //TablePlaylist.setItems(observableList);
-        //Song initSong = new Song("ts22xxx.mp3", "-", player.getPath());
-        //TablePlaylist.getItems().add(initSong);
-        //playlist.addSong(initSong);
 
         playlist = MP3Player.getInstance().getCurrentPlaylist();
         if (playlist != null) {
@@ -398,20 +398,14 @@ public class Controller implements Initializable {
 //            labelSongDescription.setText(title);
             refreshTitle(title);
             MP3Player.getInstance().setTitle(title);
-            //Thread.sleep(2000);
-            //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
-            //TablePlaylist.getItems().add(new Song(title, "unknown", player.getPath()));
 
-            //playPauseButton.setText("Pause");
             playPauseImage.setImage(new Image("/icons/pause.png"));
             played = true;
         } else { //pause, continue
             boolean tmp = MP3Player.getInstance().pause();
             if (tmp)
-                //playPauseButton.setText("Play");
                 playPauseImage.setImage(new Image("/icons/play.png"));
             else
-                //playPauseButton.setText("Pause");
                 playPauseImage.setImage(new Image("/icons/pause.png"));
         }
         Communication.getInstance().sendStatus();
@@ -646,7 +640,7 @@ public class Controller implements Initializable {
         }
     }
 
-    public void refreshTitle(String t){
+    public void refreshTitle(String t) {
         labelRefresher.refresh(t);
     }
 }

@@ -9,6 +9,11 @@ import java.io.PrintWriter;
 import java.net.*;
 import java.util.Random;
 
+/**
+ * Communication - Singleton
+ * klasa służy do komunikacji z aplikacją klienta
+ * Wysyła dane o tym co się dzieje z odtwarzaczem oraz przyjmując dane on klienta modyfikuje stan odtwarzacza.
+ */
 public class Communication extends Thread {
     private static Communication instance = null;
 
@@ -32,11 +37,8 @@ public class Communication extends Thread {
     //TODO  Zmienic komunikacje, caly czas bedzie wymiana danych
     private Communication() {
         Random generator = new Random();
-        //pin = generator.nextInt(1000) + 8999;
-//        pin = generator.nextInt(9)*1000 + generator.nextInt(9)*100
-//                +generator.nextInt(9)*10 + generator.nextInt(9);
         pin = "";
-        for(int i=0; i<4; i++){
+        for (int i = 0; i < 4; i++) {
             pin += Integer.toString(generator.nextInt(9));
         }
     }
@@ -74,9 +76,8 @@ public class Communication extends Thread {
             return;
         }
         while (!initConnection()) ;
-        //TODO dopisac zabezpieczenie polaczenia pinem wewnatrz initConnection
 
-        //controller.comConnected();
+        controller.comConnected();
         sendThread = new SendThread();
         receiveThread = new ReceiveThread();
         sendThread.start();
@@ -147,18 +148,20 @@ public class Communication extends Thread {
         return true;
     }
 
-    public void closeCommunication(){
-        if(sendThread!=null)
+    public void closeCommunication() {
+        if (sendThread != null)
             sendThread.close();
-        if(receiveThread!=null)
+        if (receiveThread != null)
             sendThread.close();
     }
 
     public void resetCommunication() {
         sendThread.close();
         receiveThread.close();
-        sendThread = null;
-        receiveThread = null;
+        //sendThread = null;
+        //receiveThread = null;
+        instance = null;
+        instance = new Communication();
     }
 
     public enum MessageType {
@@ -192,7 +195,8 @@ public class Communication extends Thread {
         public void send(String msg) {
             out.println(msg);
         }
-        public void close(){
+
+        public void close() {
             try {
                 clientSocket.close();
             } catch (IOException e) {
@@ -251,12 +255,11 @@ public class Communication extends Thread {
                     String title = message.song.getSongName();
                     String path = message.song.getSongPath();
                     controller.setSong(title, path);
-                }else if(message.messageType == MessageType.SETVOLUME){
+                } else if (message.messageType == MessageType.SETVOLUME) {
                     controller.setVolumeValue(message.volValue);
                 }
             }
 
-//            resetCommunication();
             controller.closeCommunication();
         }
 
@@ -272,7 +275,8 @@ public class Communication extends Thread {
             }
             return msg;
         }
-        public void close(){
+
+        public void close() {
             try {
                 clientSocket.close();
             } catch (IOException e) {
