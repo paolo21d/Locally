@@ -90,6 +90,10 @@ public class Communication extends Thread {
         }
     }
 
+    public boolean isConnected() {
+        return connected;
+    }
+
     public void sendStatus() {
         Gson json = new Gson();
 //        String msg = json.toJson(status);

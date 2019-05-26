@@ -37,6 +37,10 @@ public class Controller implements Initializable {
     //Communication communication;
     private double volumeValue =100; //range 0-100
     private boolean mute = false;
+
+    private Thread updaterLabelThread;
+    LabelRefresher labelRefresher = new LabelRefresher();
+
     @FXML
     private VBox mainBox;
     @FXML
@@ -243,16 +247,19 @@ public class Controller implements Initializable {
 
     /////////////////INITIALIZE
     public void initialize(URL location, ResourceBundle resources) {
-        if (MP3Player.getInstance().getStatus().played) {//
+        if (MP3Player.getInstance().getStatus().played) {//inicjalizacja po powrocie z widoku minimalizacji
             playPauseImage.setImage(new Image("/icons/pause.png"));
-            labelSongDescription.setText(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
+            //labelSongDescription.setText(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
+            labelSongDescription.setText(MP3Player.getInstance().getStatus().title);
             volumeSlider.setValue(MP3Player.getInstance().getStatus().volumeValue * 100);
-            changeVolume();
             volumeValue = volumeSlider.getValue(); //TODO naprawic slider po zmianie widoku
+            changeVolume();
             played = true;
         }
         if (MP3Player.getInstance().getStatus().paused) {
             playPauseImage.setImage(new Image("/icons/play.png"));
+            //labelSongDescription.setText(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
+            labelSongDescription.setText(MP3Player.getInstance().getStatus().title);
         }
 
         inited = true;
@@ -298,6 +305,10 @@ public class Controller implements Initializable {
             playPause();
             played = false;
         }
+
+        labelSongDescription.textProperty().bind(labelRefresher.messageProperty());
+        updaterLabelThread = new Thread(labelRefresher);
+        updaterLabelThread.start();
     }
 
     public void updateValuesTime() {
@@ -371,18 +382,21 @@ public class Controller implements Initializable {
 
     public synchronized void playPause() {
         if (!MP3Player.getInstance().getStatus().played) { //start play
-            labelSongDescription.setText("Opening...");
+            //labelSongDescription.setText("Opening...");
+            refreshTitle("Opening...");
             try {
                 MP3Player.getInstance().play();
             } catch (Exception e) {
-                labelSongDescription.setText("File Open Error. Choose right path to file...");
+//                labelSongDescription.setText("File Open Error. Choose right path to file...");
+                refreshTitle("File Open Error. Choose right path to file...");
                 return;
             }
             if (MP3Player.getInstance().getStatus().path == null || MP3Player.getInstance().getPath() == null)
                 return;
             String[] fullPath = MP3Player.getInstance().getPath().split("/");
             String title = fullPath[fullPath.length - 1];
-            labelSongDescription.setText(title);
+//            labelSongDescription.setText(title);
+            refreshTitle(title);
             MP3Player.getInstance().setTitle(title);
             //Thread.sleep(2000);
             //TablePlaylist.getItems().add(new Song(title, player.parseTime(player.getAllDuration()), player.getPath()));
@@ -630,6 +644,10 @@ public class Controller implements Initializable {
         for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
             TablePlaylist.getItems().add(new SongTable(s));
         }
+    }
+
+    public void refreshTitle(String t){
+        labelRefresher.refresh(t);
     }
 }
 
