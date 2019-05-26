@@ -17,7 +17,7 @@ public class Communication extends Thread {
     private final int sendPort = 10002;
     private final int receivePort = 10003;
     private Controller controller;
-    private int pin;
+    private String pin;
     private MP3Player.PlayerStatus status;
     private SendThread sendThread;
     private ReceiveThread receiveThread;
@@ -32,7 +32,13 @@ public class Communication extends Thread {
     //TODO  Zmienic komunikacje, caly czas bedzie wymiana danych
     private Communication() {
         Random generator = new Random();
-        pin = generator.nextInt(1000) + 8999;
+        //pin = generator.nextInt(1000) + 8999;
+//        pin = generator.nextInt(9)*1000 + generator.nextInt(9)*100
+//                +generator.nextInt(9)*10 + generator.nextInt(9);
+        pin = "";
+        for(int i=0; i<4; i++){
+            pin += Integer.toString(generator.nextInt(9));
+        }
     }
 
     public static Communication getInstance() {
@@ -46,7 +52,7 @@ public class Communication extends Thread {
         status = st;
     }
 
-    int getPin() {
+    String getPin() {
         return pin;
     }
 
@@ -104,6 +110,7 @@ public class Communication extends Thread {
             udpSocket.receive(receivePacket);
         } catch (IOException e) {
             e.printStackTrace();
+            udpSocket.close();
             return false;
         }
         String sentence = new String(receivePacket.getData());
@@ -113,7 +120,7 @@ public class Communication extends Thread {
         InetAddress IPAddress = receivePacket.getAddress();
         int port = receivePacket.getPort();
         String messageToClinet = "CONNECT";
-        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
+        if (!sentence.equals(pin)) { //niepoprawny pin
             System.out.println("INCORRECT PIN");
             messageToClinet = "ERRORCN";
         }
@@ -123,10 +130,12 @@ public class Communication extends Thread {
             udpSocket.send(sendPacket);
         } catch (IOException e) {
             e.printStackTrace();
+            udpSocket.close();
             return false;
         }
+        udpSocket.close();
         /////////client has my IP address
-        if (!sentence.equals(Integer.toString(pin))) { //niepoprawny pin
+        if (!sentence.equals(pin)) { //niepoprawny pin
             connected = false;
             return false;
         }
@@ -134,8 +143,16 @@ public class Communication extends Thread {
         return true;
     }
 
+    public void closeCommunication(){
+        if(sendThread!=null)
+            sendThread.close();
+        if(receiveThread!=null)
+            sendThread.close();
+    }
 
     public void resetCommunication() {
+        sendThread.close();
+        receiveThread.close();
         sendThread = null;
         receiveThread = null;
     }
@@ -170,6 +187,13 @@ public class Communication extends Thread {
 
         public void send(String msg) {
             out.println(msg);
+        }
+        public void close(){
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -243,6 +267,13 @@ public class Communication extends Thread {
                 e.printStackTrace();
             }
             return msg;
+        }
+        public void close(){
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

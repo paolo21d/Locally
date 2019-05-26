@@ -18,7 +18,7 @@ public class AllPlaylistsTest {
         assertEquals("defaultPlaylist", pl.getAllPlaylists().get(0).getPlName());
         assertEquals(0, pl.getAllPlaylists().get(0).getSongsAmount());
         assertEquals(0, pl.getAllPlaylists().get(0).getAllSongs().size());
-        assertEquals(0, pl.getAllPlaylists().get(0).getAllSongs().get(0));
+        //assertEquals(null, pl.getAllPlaylists().get(0).getAllSongs().get(0));
     }
 
     @Test

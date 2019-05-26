@@ -30,12 +30,12 @@ public class Controller implements Initializable {
     Playlist playlist = new Playlist();
     MP3Player.LoopType loopType = MP3Player.LoopType.RepeatAll;
     boolean inited = false;
-//    TimerTask timerTask;
+    //    TimerTask timerTask;
 //    Timer timer = new Timer();
     String labelString;
     //private MP3Player player = new MP3Player(this);
     //Communication communication;
-    private double volumeValue; //range 0-100
+    private double volumeValue =100; //range 0-100
     private boolean mute = false;
     @FXML
     private VBox mainBox;
@@ -150,7 +150,7 @@ public class Controller implements Initializable {
     void connectButtonClick(ActionEvent event) {
         if (!connection) {
             Communication.getInstance().start();
-            labelConnectionStatus.setText("PIN:" + Integer.toString(Communication.getInstance().getPin()));
+            labelConnectionStatus.setText("PIN:" + Communication.getInstance().getPin());
             connection = true;
         }
     }
@@ -312,13 +312,16 @@ public class Controller implements Initializable {
     }
 
     public void changeVolume() {
-        volumeValue = volumeSlider.getValue();
+        if (mute) {
+            volumeSlider.setValue(volumeValue);
+        } else
+            volumeValue = volumeSlider.getValue();
         //volumeSlider.setValue(volumeValue);
         MP3Player.getInstance().setVolume(volumeValue / 100);
-        labelVolume.setText(Integer.toString((int) volumeValue) + "%");
+        //labelVolume.setText(Integer.toString((int) volumeValue) + "%"); //TODO label volume value
         if (volumeValue == 0) {
             volumeIcon.setImage(new Image("/icons/volumeMute.png"));
-            mute = true;
+            //mute = true;
         } else if (volumeValue < 50) {
             volumeIcon.setImage(new Image("/icons/volumeLow.png"));
             mute = false;
@@ -328,7 +331,8 @@ public class Controller implements Initializable {
         }
         Communication.getInstance().sendStatus();
     }
-    public void setVolumeValue(double v){
+
+    public synchronized void setVolumeValue(double v) {
         volumeSlider.setValue(v);
         changeVolume();
     }
@@ -359,7 +363,7 @@ public class Controller implements Initializable {
         }
     }
 
-    public void setSong(String title, String path) {
+    public synchronized void setSong(String title, String path) {
         MP3Player.getInstance().setSong(title, path);
         played = false;
         playPause();
@@ -406,12 +410,12 @@ public class Controller implements Initializable {
 
     public void volumeImageClicked(MouseEvent mouseEvent) {
         //TODO naprawic po wyciszeniu zeby wracalo do dobrego stanu
-        if (played && !mute) {
+        if (MP3Player.getInstance().getStatus().played && !mute) {
             volumeMute();
-        } else if (played && mute) {
+        } else if (MP3Player.getInstance().getStatus().played && mute) {
             MP3Player.getInstance().setVolume(volumeValue / 100);
-            labelVolume.setText(Integer.toString((int) volumeValue) + "%");
-            volumeSlider.setValue(volumeValue / 100);
+            //labelVolume.setText(Integer.toString((int) volumeValue) + "%");
+            volumeSlider.setValue(volumeValue);
             mute = false;
             if (volumeValue < 50) {
                 volumeIcon.setImage(new Image("/icons/volumeLow.png"));
@@ -422,31 +426,33 @@ public class Controller implements Initializable {
         Communication.getInstance().sendStatus();
     }
 
-    public void volumeMute() {
-        if (!played) return;
+    public synchronized void volumeMute() {
+        //if (!MP3Player.getInstance().getStatus().played) return;
         volumeValue = volumeSlider.getValue();
         mute = true;
         MP3Player.getInstance().setVolume(0);
-        labelVolume.setText("0%");
+        //labelVolume.setText("0%");
         volumeSlider.setValue(0);
         volumeIcon.setImage(new Image("/icons/volumeMute.png"));
+        Communication.getInstance().sendStatus();
     }
 
-    public void volumeDown() {
-        if (!played) return;
+    public synchronized void volumeDown() {
+        if (!MP3Player.getInstance().getStatus().played) return;
         if (mute) return;
         if (volumeValue - 10 <= 0) {
             volumeMute();
         } else {
             volumeValue -= 10;
             MP3Player.getInstance().setVolume(volumeValue / 100);
-            labelVolume.setText(Double.toString(volumeValue) + "%");
+            //labelVolume.setText(Double.toString(volumeValue) + "%");
             volumeSlider.setValue(volumeValue);
+            changeVolume();
         }
         Communication.getInstance().sendStatus();
     }
 
-    public void volumeUp() {
+    public synchronized void volumeUp() {
         if (mute) {
             mute = false;
         }
@@ -454,12 +460,13 @@ public class Controller implements Initializable {
         if (volumeValue > 100)
             volumeValue = 100;
         MP3Player.getInstance().setVolume(volumeValue / 100);
-        labelVolume.setText(Double.toString(volumeValue) + "%");
+        //labelVolume.setText(Double.toString(volumeValue) + "%");
         volumeSlider.setValue(volumeValue);
+        changeVolume();
         Communication.getInstance().sendStatus();
     }
 
-    public void speedButtonClick(ActionEvent actionEvent) {
+    public synchronized void speedButtonClick(ActionEvent actionEvent) {
         if (MP3Player.getInstance().getRate() == 1) {
             MP3Player.getInstance().setRate(1.5);
             speedButton.setText("x1.5");
@@ -486,7 +493,7 @@ public class Controller implements Initializable {
             VBox main2 = FXMLLoader.load(getClass().getResource("/layoutMinimalize.fxml"));
             //MP3Player.getInstance().pause();
             Main.mainStage.setWidth(255);
-            Main.mainStage.setHeight(130);
+            Main.mainStage.setHeight(100);
             mainBox.getChildren().setAll(main2);
         } catch (IOException e) {
             e.printStackTrace();
@@ -613,11 +620,12 @@ public class Controller implements Initializable {
     }
 
     public void menuClose(ActionEvent actionEvent) {
+        Communication.getInstance().closeCommunication();
         Main.mainStage.close();
         System.exit(0);
     }
 
-    public void refreshSongTable(){
+    public void refreshSongTable() {
         TablePlaylist.getItems().clear();
         for (Song s : MP3Player.getInstance().getStatus().currentPlaylist.getAllSongs()) {
             TablePlaylist.getItems().add(new SongTable(s));
