@@ -33,9 +33,10 @@ public class AllPlaylists {
 
     public boolean writePlaylistsToFile(String argFile) {
         String path;
-        if (argFile.equals(""))
-            path = new File("src/main/resources/playlists.json").getAbsolutePath();
-        else
+        if (argFile.equals("")) {
+            //path = new File("src/main/resources/playlists.json").getAbsolutePath();
+            path = "playlists.json";
+        } else
             path = "src/main/resources/" + argFile;
         Gson json = new Gson();
         String response = json.toJson(this);
@@ -55,9 +56,10 @@ public class AllPlaylists {
 
     public boolean readPlaylistsFromFile(String argFile) {
         String path;
-        if (argFile.equals(""))
-            path = new File("src/main/resources/playlists.json").getAbsolutePath();
-        else
+        if (argFile.equals("")) {
+//            path = new File("src/main/resources/playlists.json").getAbsolutePath();
+            path = "playlists.json";
+        } else
             path = "src/main/resources/" + argFile;
         String data = new String("");
         try {

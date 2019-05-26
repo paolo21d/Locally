@@ -247,6 +247,10 @@ public class Controller implements Initializable {
 
     /////////////////INITIALIZE
     public void initialize(URL location, ResourceBundle resources) {
+        labelSongDescription.textProperty().bind(labelRefresher.messageProperty());
+        updaterLabelThread = new Thread(labelRefresher);
+        updaterLabelThread.start();
+
         if (MP3Player.getInstance().getStatus().played) {//inicjalizacja po powrocie z widoku minimalizacji
             playPauseImage.setImage(new Image("/icons/pause.png"));
             //labelSongDescription.setText(MP3Player.getInstance().getStatus().currentPlaylist.getSongByIndex(MP3Player.getInstance().getStatus().currentlyPlayedSongIndex).getSongName());
@@ -305,10 +309,6 @@ public class Controller implements Initializable {
             playPause();
             played = false;
         }
-
-        labelSongDescription.textProperty().bind(labelRefresher.messageProperty());
-        updaterLabelThread = new Thread(labelRefresher);
-        updaterLabelThread.start();
     }
 
     public void updateValuesTime() {
