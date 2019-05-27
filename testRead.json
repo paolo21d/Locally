@@ -1,0 +1,62 @@
+{
+  "playlists": [
+    {
+      "songs": [
+        {
+          "songName": "Taylor Swift - Ready For It.mp3",
+          "songTime": "3:30",
+          "songPath": "C:/Users/paolo/Music/Taylor Swift - Ready For It.mp3"
+        },
+        {
+          "songName": "lily.mp3",
+          "songTime": "3:16",
+          "songPath": "C:/Users/paolo/Desktop/LocallyMusic/lily.mp3"
+        },
+        {
+          "songName": "TS22.mp3",
+          "songTime": "4:03",
+          "songPath": "C:/Users/paolo/Desktop/LocallyMusic/TS22.mp3"
+        },
+        {
+          "songName": "The Hanging Tree.mp3",
+          "songTime": "3:40",
+          "songPath": "C:/Users/paolo/Desktop/LocallyMusic/The Hanging Tree.mp3"
+        },
+        {
+          "songName": "Zara Larsson - Lush Life.mp3",
+          "songTime": "3:21",
+          "songPath": "C:/Users/paolo/Desktop/LocallyMusic/Zara Larsson - Lush Life.mp3"
+        },
+        {
+          "songName": "Hands to Myself-.mp3",
+          "songTime": "3:41",
+          "songPath": "C:/Users/paolo/Desktop/LocallyMusic/Hands to Myself-.mp3"
+        }
+      ],
+      "plName": "defaultPlaylist",
+      "songsAmount": 6
+    },
+    {
+      "songs": [
+        {
+          "songName": "Taylor Swift - Ready For It.mp3",
+          "songTime": "3:30",
+          "songPath": "C:/Users/paolo/Music/Taylor Swift - Ready For It.mp3"
+        },
+        {
+          "songName": "lily.mp3",
+          "songTime": "3:16",
+          "songPath": "C:/Users/paolo/Desktop/LocallyMusic/lily.mp3"
+        },
+        {
+          "songName": "The Hanging Tree.mp3",
+          "songTime": "3:40",
+          "songPath": "C:/Users/paolo/Desktop/LocallyMusic/The Hanging Tree.mp3"
+        }
+      ],
+      "plName": "NewPlaylist",
+      "songsAmount": 3
+    }
+  ],
+  "playlistsAmount": 2
+}

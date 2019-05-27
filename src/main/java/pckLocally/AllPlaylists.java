@@ -37,7 +37,7 @@ public class AllPlaylists {
             //path = new File("src/main/resources/playlists.json").getAbsolutePath();
             path = "playlists.json";
         } else
-            path = "src/main/resources/" + argFile;
+            path = argFile;
         Gson json = new Gson();
         String response = json.toJson(this);
 
@@ -60,7 +60,7 @@ public class AllPlaylists {
 //            path = new File("src/main/resources/playlists.json").getAbsolutePath();
             path = "playlists.json";
         } else
-            path = "src/main/resources/" + argFile;
+            path = argFile;
         String data = new String("");
         try {
             File myObj = new File(path);
@@ -87,9 +87,6 @@ public class AllPlaylists {
 
         this.playlists = tmp.playlists;
         this.playlistsAmount = tmp.playlistsAmount;
-        //playlists = new ArrayList<Playlist>();
-        //playlistsAmount = 0;
-
         return true;
     }
 
